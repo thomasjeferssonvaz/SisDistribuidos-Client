@@ -1,0 +1,40 @@
+/* styles.css */
+.root {
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.main-background {
+    -fx-background-color: #1e1e2e;
+}
+
+.upperNav {
+    -fx-background-color: #2b2b3b;
+}
+
+.text {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+.mainBox {
+    -fx-background-color: #1e1e2e;
+}
+
+.footer {
+    -fx-background-color: #2b2b3b;
+}
+
+.svgButton {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-padding: 4px;
+}
+
+.svgButton:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 4px;
+}
+
+.svgButton:pressed {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+}

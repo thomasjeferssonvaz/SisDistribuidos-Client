@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.ConfigController">
+
+    <!-- Form fields aligned in a grid -->
+    <GridPane alignment="CENTER" hgap="16.0" vgap="14.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columnConstraints>
+            <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="-Infinity" />
+            <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
+        </columnConstraints>
+
+        <!-- Row 0: IP -->
+        <Label styleClass="text" text="IP do Servidor:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="serverIpField" prefWidth="180.0" promptText="127.0.0.1" text="127.0.0.1" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <!-- Row 1: Port -->
+        <Label styleClass="text" text="Porta:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="serverPortField" prefWidth="180.0" promptText="34345" text="34345" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Button fx:id="logout" onMouseClicked="#deslogar" text="Deslogar" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+    </GridPane>
+
+    <Button onMouseClicked="#salvar" mnemonicParsing="false" text="Salvar" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+</AnchorPane>
