@@ -8,4 +8,7 @@ public record User(
     public static User user(String username, String token){
         return new User(username, "", token);
     }
+    public static User user(String token){
+        return new User("", "", token);
+    }
 }

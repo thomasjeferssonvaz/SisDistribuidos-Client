@@ -35,7 +35,7 @@ public class SocketManager {
 
             String jsonReceived = in.readLine();
             Response response;
-            if (jsonReceived == null) {
+            if (jsonReceived == null || jsonReceived.isEmpty() || jsonReceived.equals("null")) {
                 return new ServerConnectionError().toResponse();
             } else {
                 response = gson.fromJson(jsonReceived, Response.class);
@@ -43,7 +43,7 @@ public class SocketManager {
 
 
             System.out.println("Received: " + jsonReceived);
-            System.out.println("Parsed:   [Status: " + response.status() + ", Result: " + response.result() + ", Data: "+ response.data() + ", Error: " + response.error() + "]\n");
+            System.out.println("Parsed:   [Status: " + response.statusCode() + ", Result: " + response.message() + ", Data: "+ response.data() + ", Error: " + response.error() + "]\n");
 
             return response;
         } catch (IOException e) {

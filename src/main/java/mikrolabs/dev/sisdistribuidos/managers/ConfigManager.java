@@ -43,8 +43,10 @@ public class ConfigManager {
     public static synchronized void saveToken(String token) {
         if (token == null || token.isBlank()) {
             properties.remove("Token");
+            System.out.println("Token removido com sucesso!");
         } else {
             properties.setProperty("Token", token);
+            System.out.println("Token salvo com sucesso!");
         }
         persist();
     }
@@ -55,6 +57,7 @@ public class ConfigManager {
 
     public static synchronized void clearToken() {
         properties.remove("Token");
+        System.out.println("Token removido com sucesso!");
         persist();
     }
 

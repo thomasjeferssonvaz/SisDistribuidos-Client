@@ -1,12 +1,14 @@
 package mikrolabs.dev.sisdistribuidos.DTOs;
 
+import com.google.gson.JsonElement;
+
 public record Response(
-        int status,
-        String result,
-        String data,
+        int statusCode,
+        String message,
+        JsonElement data,
         String error
 ) {
-    public static Response success(String result, String data) {
+    public static Response success(String result, JsonElement data) {
         return new Response(200, result, data, null);
     }
     public static Response success(String result) {

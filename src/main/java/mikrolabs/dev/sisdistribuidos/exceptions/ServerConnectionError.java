@@ -8,6 +8,7 @@ public class ServerConnectionError extends RuntimeException {
     }
 
     public Response toResponse() {
+        System.out.println("Server connection error");
         return Response.error(500, "Server connection error");
     }
 }

@@ -1,46 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <?import javafx.scene.shape.SVGPath?>
+
 <AnchorPane prefHeight="600.0" prefWidth="900.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.LoginController">
+
+    <!-- Navbar Superior -->
     <HBox alignment="CENTER" prefHeight="60.0" spacing="10.0" styleClass="upperNav" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <padding>
-            <javafx.geometry.Insets left="20.0" right="20.0" />
+            <Insets left="24.0" right="24.0" />
         </padding>
 
         <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
-            <Label styleClass="text" text="Login" />
+            <Label styleClass="brand-title" text="Portal de Acesso" />
         </HBox>
         <HBox alignment="CENTER_RIGHT">
-            <Button fx:id="configBtn" styleClass="svgButton" contentDisplay="GRAPHIC_ONLY" onAction="#abrirConfiguracoes">
+            <Button fx:id="configBtn" contentDisplay="GRAPHIC_ONLY" onAction="#abrirConfiguracoes" styleClass="svgButton">
                 <graphic>
-                    <SVGPath content="M12 23.0625 L8.7031 19.75 L4.25 19.75 L4.25 15.2969 L0.9375 12 L4.25 8.6875 L4.25 4.2344 L8.7031 4.2344 L12 0.9375 L15.3125 4.2344 L19.7656 4.2344 L19.7656 8.6875 L23.0625 12 L19.7656 15.2969 L19.7656 19.75 L15.3125 19.75 L12 23.0625 L12 23.0625 ZM5.75 18.25 L9.3125 18.25 L12 20.9219 L14.7031 18.25 L18.2656 18.25 L18.2656 14.6875 L20.9375 12 L18.2656 9.2969 L18.2656 5.7344 L14.7031 5.7344 L12 3.0625 L9.3125 5.7344 L5.75 5.7344 L5.75 9.2969 L3.0781 12 L5.75 14.6875 L5.75 18.25 ZM12 15.75 Q10.4531 15.75 9.3438 14.6562 Q8.25 13.5469 8.25 12 Q8.25 10.4531 9.3438 9.3594 Q10.4531 8.25 12 8.25 Q13.5469 8.25 14.6406 9.3594 Q15.75 10.4531 15.75 12 Q15.75 13.5469 14.6406 14.6562 Q13.5469 15.75 12 15.75 ZM12 9.75 Q11.0625 9.75 10.4062 10.4062 Q9.75 11.0625 9.75 12 Q9.75 12.9375 10.4062 13.5938 Q11.0625 14.25 12 14.25 Q12.9375 14.25 13.5938 13.5938 Q14.25 12.9375 14.25 12 Q14.25 11.0625 13.5938 10.4062 Q12.9375 9.75 12 9.75 Z" fill="WHITE" scaleX="0.8" scaleY="0.8" />
+                    <SVGPath content="M12 23.0625 L8.7031 19.75 L4.25 19.75 L4.25 15.2969 L0.9375 12 L4.25 8.6875 L4.25 4.2344 L8.7031 4.2344 L12 0.9375 L15.3125 4.2344 L19.7656 4.2344 L19.7656 8.6875 L23.0625 12 L19.7656 15.2969 L19.7656 19.75 L15.3125 19.75 L12 23.0625 ZM5.75 18.25 L9.3125 18.25 L12 20.9219 L14.7031 18.25 L18.2656 18.25 L18.2656 14.6875 L20.9375 12 L18.2656 9.2969 L18.2656 5.7344 L14.7031 5.7344 L12 3.0625 L9.3125 5.7344 L5.75 5.7344 L5.75 9.2969 L3.0781 12 L5.75 14.6875 L5.75 18.25 ZM12 15.75 Q10.4531 15.75 9.3438 14.6562 Q8.25 13.5469 8.25 12 Q8.25 10.4531 9.3438 9.3594 Q10.4531 8.25 12 8.25 Q13.5469 8.25 14.6406 9.3594 Q15.75 10.4531 15.75 12 Q15.75 13.5469 14.6406 14.6562 Q13.5469 15.75 12 15.75 ZM12 9.75 Q11.0625 9.75 10.4062 10.4062 Q9.75 11.0625 9.75 12 Q9.75 12.9375 10.4062 13.5938 Q11.0625 14.25 12 14.25 Q12.9375 14.25 13.5938 13.5938 Q14.25 12.9375 14.25 12 Q14.25 11.0625 13.5938 10.4062 Q12.9375 9.75 12 9.75 Z" scaleX="0.8" scaleY="0.8" styleClass="svg-icon" />
                 </graphic>
             </Button>
         </HBox>
     </HBox>
-    <VBox alignment="CENTER" prefHeight="481.0" prefWidth="900.0" spacing="10.0" styleClass="mainBox" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" AnchorPane.bottomAnchor="60.0">
-        <padding>
-            <javafx.geometry.Insets left="20.0" right="20.0" />
-        </padding>
-        <HBox alignment="CENTER" spacing="10.0">
-            <Label styleClass="text" text="Username" />
-            <TextField fx:id="usernameTextBox" />
-        </HBox>
-        <HBox alignment="CENTER" spacing="10.0">
-            <Label styleClass="text" text="Password" />
-            <PasswordField fx:id="passwordTextBox" />
-        </HBox>
-        <Button fx:id="enviarBtn" mnemonicParsing="false" onAction="#logar" text="Logar"/>
-        <Label fx:id="returnLabel" styleClass="text" />
-    </VBox>
-    <HBox alignment="CENTER" layoutX="78.0" layoutY="538.0" prefHeight="60.0" spacing="10.0" styleClass="upperNav" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-        <padding>
-            <javafx.geometry.Insets left="20.0" right="20.0" />
-        </padding>
-        <Label styleClass="text" text="By Mikrolabs.dev" />
+
+    <!-- Área Central de Conteúdo -->
+    <!-- Área Central de Conteúdo com margem vertical de 24px acima e abaixo -->
+    <StackPane AnchorPane.bottomAnchor="74.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="84.0">
+
+        <!-- Card de Login -->
+        <VBox fx:id="loginBox" alignment="TOP_CENTER" maxWidth="400.0" spacing="14.0" styleClass="auth-card">
+            <VBox alignment="CENTER" spacing="4.0">
+                <Label styleClass="card-title" text="Bem-vindo" />
+                <Label styleClass="card-subtitle" text="Entre com suas credenciais para acessar" />
+            </VBox>
+
+            <VBox spacing="4.0">
+                <Label styleClass="field-label" text="Usuário" />
+                <TextField fx:id="usernameTextBox" promptText="Digite seu usuário" />
+            </VBox>
+
+            <VBox spacing="4.0">
+                <Label styleClass="field-label" text="Senha" />
+                <PasswordField fx:id="passwordTextBox" promptText="Digite sua senha" />
+            </VBox>
+
+            <Button fx:id="enviarBtn" maxWidth="Infinity" onAction="#logar" styleClass="primary-button" text="Entrar">
+                <VBox.margin>
+                    <Insets top="4.0" />
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="switchModeLoginButton" onAction="#switchMode" styleClass="switchModeButton" text="Não tem conta? Cadastre-se aqui" />
+
+            <Label fx:id="returnLabel" styleClass="feedback-label" textAlignment="CENTER" wrapText="true" />
+        </VBox>
+
+        <!-- Card de Registro -->
+        <VBox fx:id="registerBox" alignment="TOP_CENTER" maxWidth="400.0" spacing="12.0" styleClass="auth-card" visible="false">
+            <VBox alignment="CENTER" spacing="4.0">
+                <Label styleClass="card-title" text="Criar Conta" />
+                <Label styleClass="card-subtitle" text="Preencha os dados abaixo para se cadastrar" />
+            </VBox>
+
+            <VBox spacing="4.0">
+                <Label styleClass="field-label" text="Nome Completo" />
+                <TextField fx:id="nameRegisterTextBox" promptText="Seu nome" />
+            </VBox>
+
+            <VBox spacing="4.0">
+                <Label styleClass="field-label" text="Usuário" />
+                <TextField fx:id="usernameRegisterTextBox" promptText="Nome de usuário desejado" />
+            </VBox>
+
+            <VBox spacing="4.0">
+                <Label styleClass="field-label" text="Senha" />
+                <PasswordField fx:id="passwordRegisterTextBox" promptText="Escolha uma senha" />
+            </VBox>
+
+            <Button fx:id="enviarRegisterBtn" maxWidth="Infinity" onAction="#registrar" styleClass="primary-button" text="Finalizar Cadastro">
+                <VBox.margin>
+                    <Insets top="4.0" />
+                </VBox.margin>
+            </Button>
+
+            <Button fx:id="switchModeRegisterButton" onAction="#switchMode" styleClass="switchModeButton" text="Já possui uma conta? Voltar ao login" />
+
+            <Label fx:id="returnRegisterLabel" styleClass="feedback-label" textAlignment="CENTER" wrapText="true" />
+        </VBox>
+    </StackPane>
+
+    <!-- Rodapé -->
+    <HBox alignment="CENTER" prefHeight="50.0" styleClass="footer" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+        <Label styleClass="footer-text" text="Desenvolvido por Mikrolabs.dev" />
     </HBox>
 </AnchorPane>

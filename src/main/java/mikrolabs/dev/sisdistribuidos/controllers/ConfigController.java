@@ -7,12 +7,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import mikrolabs.dev.sisdistribuidos.DTOs.Request;
+import mikrolabs.dev.sisdistribuidos.DTOs.Response;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
+import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
+import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
+import mikrolabs.dev.sisdistribuidos.utils.Toast;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ConfigController implements Initializable {
+public class ConfigController extends BaseController implements Initializable {
 
 
     public Button logout;
@@ -27,10 +33,12 @@ public class ConfigController implements Initializable {
             serverIpField.setText(ConfigManager.getServerIp());
             serverPortField.setText(String.valueOf(ConfigManager.getServerPort()));
         }
-        if (ConfigManager.getToken() != null) {
-            logout.setDisable(false);
-        } else  {
-            logout.setDisable(true);
+
+
+        String token = ConfigManager.getToken();
+        boolean isLoggedIn = token != null && !"notloggedin".equals(token);
+        if (token != null) {
+            logout.setVisible(isLoggedIn);
         }
     }
 
@@ -46,8 +54,27 @@ public class ConfigController implements Initializable {
         stage.close();
     }
 
+    @FXML
     public void deslogar(MouseEvent mouseEvent) {
         ConfigManager.clearToken();
-        Stage stage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
+        Response logoutResponse = SocketManager.sendRequest(new Request("logout", null));
+
+        Stage modalStage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
+        Stage ownerStage = (Stage) modalStage.getOwner();
+
+        if(logoutResponse.statusCode() == 200) {
+            Toast.show(ownerStage != null ? ownerStage : modalStage, logoutResponse.message(), Toast.Type.SUCCESS);
+        } else {
+            Toast.show(ownerStage != null ? ownerStage : modalStage, logoutResponse.message(), Toast.Type.ERROR);
+        }
+
+
+        modalStage.close();
+
+        try {
+            NavigationUtils.navigateTo(ownerStage, "views/Login.fxml", "Login");
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar tela de login: " + e.getMessage());
+        }
     }
 }

@@ -1,40 +1,216 @@
-/* styles.css */
+/* ==========================================================================
+   PALETA DE CORES & VARIÁVEIS BASE
+   ========================================================================== */
 .root {
-    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+    -fx-accent-color: #7287fd;
+    -fx-focus-color: #89b4fa;
 }
 
+/* Fundo Principal */
 .main-background {
-    -fx-background-color: #1e1e2e;
+    -fx-background-color: #181825;
 }
 
+/* Barra Superior e Rodapé */
 .upperNav {
-    -fx-background-color: #2b2b3b;
-}
-
-.text {
-    -fx-text-fill: #FFFFFF;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-}
-.mainBox {
     -fx-background-color: #1e1e2e;
+    -fx-border-color: transparent transparent #313244 transparent;
+    -fx-border-width: 0 0 1 0;
 }
 
 .footer {
-    -fx-background-color: #2b2b3b;
+    -fx-background-color: #1e1e2e;
+    -fx-border-color: #313244 transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
 }
 
+.footer-text {
+    -fx-text-fill: #6c7086;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+}
+
+/* ==========================================================================
+   TIPOGRAFIA
+   ========================================================================== */
+.brand-title {
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+}
+
+.card-title {
+    -fx-text-fill: #cdd6f4;
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+}
+
+.card-subtitle {
+    -fx-text-fill: #a6adc8;
+    -fx-font-size: 13px;
+}
+
+.field-label {
+    -fx-text-fill: #bac2de;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.feedback-label {
+    -fx-text-fill: #f38ba8;
+    -fx-font-size: 12px;
+    -fx-font-weight: 500;
+}
+
+/* ==========================================================================
+   CARDS & CONTAINERS
+   ========================================================================== */
+.mainBox {
+    -fx-background-color: transparent;
+}
+
+.auth-card {
+    -fx-background-color: #1e1e2e;
+    -fx-background-radius: 12px;
+    -fx-border-color: #313244;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 18, 0.1, 0, 6);
+    -fx-padding: 22px 28px;
+}
+
+/* ==========================================================================
+   INPUTS (TextField & PasswordField)
+   ========================================================================== */
+.text-field, .password-field {
+    -fx-background-color: #181825;
+    -fx-background-radius: 8px;
+    -fx-border-color: #45475a;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-text-fill: #cdd6f4;
+    -fx-prompt-text-fill: #585b70;
+    -fx-padding: 9px 12px;
+    -fx-font-size: 13px;
+}
+
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #89b4fa;
+    -fx-background-color: #1e1e2e;
+    -fx-effect: dropshadow(gaussian, rgba(137, 180, 250, 0.25), 8, 0.2, 0, 0);
+}
+
+/* ==========================================================================
+   BOTÕES
+   ========================================================================== */
+/* Botão de Ação Primária (Entrar, Registrar, Salvar) */
+.primary-button {
+    -fx-background-color: #89b4fa;
+    -fx-text-fill: #11111b;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px 18px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(137, 180, 250, 0.2), 6, 0.1, 0, 2);
+}
+
+.primary-button:hover {
+    -fx-background-color: #b4befe;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #74c7ec;
+}
+
+.primary-button:disabled {
+    -fx-background-color: #45475a;
+    -fx-text-fill: #6c7086;
+    -fx-opacity: 0.8;
+}
+
+/* Botão de Perigo/Destrutivo (Deslogar) */
+.danger-button {
+    -fx-background-color: rgba(243, 139, 168, 0.15);
+    -fx-border-color: #f38ba8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #f38ba8;
+    -fx-font-weight: 600;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+}
+
+.danger-button:hover {
+    -fx-background-color: #f38ba8;
+    -fx-text-fill: #11111b;
+}
+
+/* Botão Link de Troca de Modo */
+.switchModeButton {
+    -fx-background-color: transparent;
+    -fx-text-fill: #89b4fa;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-padding: 4px;
+    -fx-underline: false;
+}
+
+.switchModeButton:hover {
+    -fx-underline: true;
+    -fx-text-fill: #b4befe;
+}
+
+/* Botão SVG de Ícone (Engrenagem / Configurações) */
 .svgButton {
     -fx-background-color: transparent;
     -fx-cursor: hand;
-    -fx-padding: 4px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px;
+}
+
+.svgButton .svg-icon {
+    -fx-fill: #a6adc8;
 }
 
 .svgButton:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.15);
-    -fx-background-radius: 4px;
+    -fx-background-color: rgba(205, 214, 244, 0.08);
 }
 
-.svgButton:pressed {
-    -fx-background-color: rgba(255, 255, 255, 0.25);
+.svgButton:hover .svg-icon {
+    -fx-fill: #cdd6f4;
+}
+
+/* ==========================================================================
+   NOTIFICAÇÕES TOAST
+   ========================================================================== */
+.toast-container {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 15, 0.15, 0, 6);
+}
+
+.toast-success {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #a6e3a1;
+    -fx-border-color: #a6e3a1;
+}
+
+.toast-error {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #f38ba8;
+    -fx-border-color: #f38ba8;
+}
+
+.toast-info {
+    -fx-background-color: #1e1e2e;
+    -fx-text-fill: #89b4fa;
+    -fx-border-color: #89b4fa;
 }

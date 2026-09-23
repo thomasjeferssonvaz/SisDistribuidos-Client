@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.ConfigController">
+<AnchorPane prefHeight="380.0" prefWidth="500.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.ConfigController">
 
-    <!-- Form fields aligned in a grid -->
-    <GridPane alignment="CENTER" hgap="16.0" vgap="14.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <columnConstraints>
-            <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="-Infinity" />
-            <ColumnConstraints halignment="LEFT" hgrow="NEVER" />
-        </columnConstraints>
+    <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets bottom="24.0" left="30.0" right="30.0" top="24.0" />
+        </padding>
 
-        <!-- Row 0: IP -->
-        <Label styleClass="text" text="IP do Servidor:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-        <TextField fx:id="serverIpField" prefWidth="180.0" promptText="127.0.0.1" text="127.0.0.1" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+        <VBox maxWidth="420.0" spacing="16.0" styleClass="auth-card" VBox.vgrow="NEVER">
+            <VBox spacing="4.0">
+                <Label styleClass="card-title" text="Configuração de Rede" />
+                <Label styleClass="card-subtitle" text="Defina os parâmetros de conexão do servidor socket" />
+            </VBox>
 
-        <!-- Row 1: Port -->
-        <Label styleClass="text" text="Porta:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-        <TextField fx:id="serverPortField" prefWidth="180.0" promptText="34345" text="34345" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <VBox spacing="6.0">
+                <Label styleClass="field-label" text="Endereço IP do Servidor" />
+                <TextField fx:id="serverIpField" promptText="127.0.0.1" text="127.0.0.1" />
+            </VBox>
 
-        <Button fx:id="logout" onMouseClicked="#deslogar" text="Deslogar" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-    </GridPane>
+            <VBox spacing="6.0">
+                <Label styleClass="field-label" text="Porta do Serviço" />
+                <TextField fx:id="serverPortField" promptText="34345" text="34345" />
+            </VBox>
 
-    <Button onMouseClicked="#salvar" mnemonicParsing="false" text="Salvar" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+            <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                <padding>
+                    <Insets top="8.0" />
+                </padding>
+                <Button fx:id="logout" onMouseClicked="#deslogar" styleClass="danger-button" text="Desconectar" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onMouseClicked="#salvar" styleClass="primary-button" text="Salvar Alterações" />
+            </HBox>
+        </VBox>
+    </VBox>
 </AnchorPane>
