@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -43,7 +45,10 @@ public class LoginController extends BaseController implements Initializable {
     public TextField nameRegisterTextBox;
     boolean isRegister;
     Gson gson = new Gson();
-
+    @FXML
+    private Node navbar;
+    @FXML
+    private Node footer;
 
 
     @Override
@@ -90,7 +95,7 @@ public class LoginController extends BaseController implements Initializable {
 
                     if (isSuccess && loginResponse.data() != null) {
                         try {
-                            System.out.println("Received pré gson: " + loginResponse);
+                            System.out.println("Received pré Gson: " + loginResponse);
                             JsonObject jsonObject = loginResponse.data().getAsJsonObject();
                             String token = jsonObject.get("token").getAsString();
                             User user = new User("", "", token);
@@ -199,11 +204,6 @@ public class LoginController extends BaseController implements Initializable {
                 });
             }
         }).start();
-
-
-
-        //Toast.show(toast, "Registro realizado com sucesso", Toast.Type.SUCCESS);
-
     }
 
 

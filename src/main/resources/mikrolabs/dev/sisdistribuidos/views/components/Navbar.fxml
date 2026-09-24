@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<HBox xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="mikrolabs.dev.sisdistribuidos.controllers.BaseController"
+      alignment="CENTER"
+      prefHeight="60.0"
+      spacing="10.0"
+      styleClass="upperNav">
+    <padding>
+        <Insets left="24.0" right="24.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+        <Label styleClass="brand-title" text="Portal de Acesso" />
+    </HBox>
+    <HBox alignment="CENTER_RIGHT">
+        <Button fx:id="configBtn" contentDisplay="GRAPHIC_ONLY" onAction="#abrirConfiguracoes" styleClass="svgButton">
+            <graphic>
+                <SVGPath content="M12 23.0625 L8.7031 19.75 L4.25 19.75 L4.25 15.2969 L0.9375 12 L4.25 8.6875 L4.25 4.2344 L8.7031 4.2344 L12 0.9375 L15.3125 4.2344 L19.7656 4.2344 L19.7656 8.6875 L23.0625 12 L19.7656 15.2969 L19.7656 19.75 L15.3125 19.75 L12 23.0625 ZM5.75 18.25 L9.3125 18.25 L12 20.9219 L14.7031 18.25 L18.2656 18.25 L18.2656 14.6875 L20.9375 12 L18.2656 9.2969 L18.2656 5.7344 L14.7031 5.7344 L12 3.0625 L9.3125 5.7344 L5.75 5.7344 L5.75 9.2969 L3.0781 12 L5.75 14.6875 L5.75 18.25 ZM12 15.75 Q10.4531 15.75 9.3438 14.6562 Q8.25 13.5469 8.25 12 Q8.25 10.4531 9.3438 9.3594 Q10.4531 8.25 12 8.25 Q13.5469 8.25 14.6406 9.3594 Q15.75 10.4531 15.75 12 Q15.75 13.5469 14.6406 14.6562 Q13.5469 15.75 12 15.75 ZM12 9.75 Q11.0625 9.75 10.4062 10.4062 Q9.75 11.0625 9.75 12 Q9.75 12.9375 10.4062 13.5938 Q11.0625 14.25 12 14.25 Q12.9375 14.25 13.5938 13.5938 Q14.25 12.9375 14.25 12 Q14.25 11.0625 13.5938 10.4062 Q12.9375 9.75 12 9.75 Z" scaleX="0.8" scaleY="0.8" styleClass="svg-icon" />
+            </graphic>
+        </Button>
+    </HBox>
+</HBox>

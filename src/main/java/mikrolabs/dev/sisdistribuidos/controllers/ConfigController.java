@@ -1,5 +1,7 @@
 package mikrolabs.dev.sisdistribuidos.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -16,6 +18,7 @@ import mikrolabs.dev.sisdistribuidos.utils.Toast;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ConfigController extends BaseController implements Initializable {
@@ -24,6 +27,7 @@ public class ConfigController extends BaseController implements Initializable {
     public Button logout;
     public TextField serverIpField;
     public TextField serverPortField;
+    Gson gson = new Gson();
 
 
     @Override
@@ -56,8 +60,11 @@ public class ConfigController extends BaseController implements Initializable {
 
     @FXML
     public void deslogar(MouseEvent mouseEvent) {
+        JsonElement data = gson.toJsonTree(Map.of(
+                "token", ConfigManager.getToken()
+        ));
+        Response logoutResponse = SocketManager.sendRequest(new Request("logout", data));
         ConfigManager.clearToken();
-        Response logoutResponse = SocketManager.sendRequest(new Request("logout", null));
 
         Stage modalStage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
         Stage ownerStage = (Stage) modalStage.getOwner();

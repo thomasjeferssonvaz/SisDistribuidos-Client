@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+    <HBox xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="mikrolabs.dev.sisdistribuidos.controllers.BaseController"
+          alignment="CENTER"
+          prefHeight="50.0"
+          styleClass="footer">
+        <Label styleClass="footer-text" text="Desenvolvido por Mikrolabs.dev" />
+    </HBox>
+
