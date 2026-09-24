@@ -8,7 +8,16 @@ public class ServerConnectionError extends RuntimeException {
     }
 
     public Response toResponse() {
-        System.out.println("Server connection error");
-        return Response.error(500, "Server connection error");
+        System.out.println(getMessage());
+        return Response.error(500, getMessage());
+    }
+
+    public Response toResponseTimeOut() {
+        System.out.println("Server Timed Out");
+        return Response.error(500, "Server Timed Out");
+    }
+    public Response toResponseGsonError() {
+        System.out.println("Gson formatting error");
+        return Response.error(500, "Gson formatting error");
     }
 }

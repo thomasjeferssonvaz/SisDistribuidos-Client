@@ -2,6 +2,7 @@ package mikrolabs.dev.sisdistribuidos.managers;
 
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import mikrolabs.dev.sisdistribuidos.DTOs.Request;
 import mikrolabs.dev.sisdistribuidos.DTOs.Response;
 import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
@@ -10,7 +11,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 
 public class SocketManager {
@@ -21,11 +24,14 @@ public class SocketManager {
         int port = ConfigManager.getServerPort() != 0 ? ConfigManager.getServerPort() : 34345;
 
 
-        try (
-                Socket socket = new Socket(ip, port);
-                PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))
-        ) {
+        try (Socket socket = new Socket()) {
+
+            socket.connect(new InetSocketAddress(ip, port), 3000);
+            socket.setSoTimeout(5000);
+
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8);
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+
             System.out.println("Connected to server at " + ip + ":" + port);
 
             String jsonToSend = gson.toJson(request);
@@ -43,9 +49,13 @@ public class SocketManager {
 
 
             System.out.println("Received: " + jsonReceived);
-            System.out.println("Parsed:   [Status: " + response.statusCode() + ", Result: " + response.message() + ", Data: "+ response.data() + ", Error: " + response.error() + "]\n");
+            System.out.println("Parsed:   [Status: " + response.statusCode() + ", Result: " + response.message() + ", Data: "+ response.data() + ", Error: " + "]\n");
 
             return response;
+        } catch (SocketTimeoutException e) {
+            return new ServerConnectionError().toResponseTimeOut();
+        }  catch (JsonSyntaxException e ) {
+            return new ServerConnectionError().toResponseGsonError();
         } catch (IOException e) {
             return  new ServerConnectionError().toResponse();
         }

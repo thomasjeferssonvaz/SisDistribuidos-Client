@@ -155,7 +155,7 @@ public class LoginController extends BaseController implements Initializable {
         String password = passwordRegisterTextBox.getText();
         Stage toast = (Stage) enviarRegisterBtn.getScene().getWindow();
 
-        if(username.isEmpty() || password.isEmpty()) {
+        if(username.isEmpty() || password.isEmpty() || name.isEmpty()) {
             Toast.show(toast, "Preencha todos os campos!", Toast.Type.INFO);
             return;
         }
@@ -178,7 +178,7 @@ public class LoginController extends BaseController implements Initializable {
                 Platform.runLater(() -> {
                     enviarRegisterBtn.setDisable(false);
 
-                    boolean isSuccess = "Usuário criado com sucesso".equalsIgnoreCase(registerResponse.message());
+                    boolean isSuccess = registerResponse.statusCode() == 200;
 
                     if (isSuccess) {
                         try {
