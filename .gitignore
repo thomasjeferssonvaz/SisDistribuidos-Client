@@ -5,10 +5,7 @@ target/
 .kotlin
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -37,3 +34,9 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Aplicação & Configurações Locais ###
+config.properties
+config-*.properties
+*.properties
+!**/src/main/resources/**/*.properties
