@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="480.0" prefWidth="500.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.ProfileController">
+
+    <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets bottom="24.0" left="30.0" right="30.0" top="24.0" />
+        </padding>
+
+        <VBox maxWidth="420.0" spacing="16.0" styleClass="auth-card" VBox.vgrow="NEVER">
+            <VBox spacing="4.0">
+                <Label styleClass="card-title" text="Meu Perfil" />
+                <Label styleClass="card-subtitle" text="Gerencie suas informações pessoais e credenciais" />
+            </VBox>
+
+            <!-- Campo Nome (Editável) -->
+            <VBox spacing="6.0">
+                <Label styleClass="field-label" text="Nome" />
+                <TextField fx:id="nameField" promptText="Seu nome completo" />
+            </VBox>
+
+            <!-- Campo Username (Bloqueado/Não alterável) -->
+            <VBox spacing="6.0">
+                <Label styleClass="field-label" text="Nome de Usuário (Username)" />
+                <TextField fx:id="usernameField" editable="false" focusTraversable="false" styleClass="readonly-field" promptText="username" />
+            </VBox>
+
+            <Separator styleClass="section-separator" />
+
+            <!-- Seção de Reset de Senha -->
+            <VBox spacing="8.0">
+                <Label styleClass="section-header-label" text="Alterar Senha" />
+
+                <VBox spacing="6.0">
+                    <Label styleClass="field-label" text="Senha Atual" />
+                    <PasswordField fx:id="currentPasswordField" promptText="********" />
+                </VBox>
+
+                <VBox spacing="6.0">
+                    <Label styleClass="field-label" text="Nova Senha" />
+                    <PasswordField fx:id="newPasswordField" promptText="********" />
+                </VBox>
+            </VBox>
+
+            <!-- Botões de Ação -->
+            <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                <padding>
+                    <Insets top="8.0" />
+                </padding>
+                <Button fx:id="logoutButton" onAction="#deslogar" styleClass="danger-button" text="Desconectar" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#salvar" styleClass="primary-button" text="Salvar Alterações" />
+            </HBox>
+        </VBox>
+    </VBox>
+</AnchorPane>

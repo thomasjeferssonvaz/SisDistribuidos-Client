@@ -31,7 +31,6 @@
                 <padding>
                     <Insets top="8.0" />
                 </padding>
-                <Button fx:id="logout" onMouseClicked="#deslogar" styleClass="danger-button" text="Desconectar" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Button mnemonicParsing="false" onMouseClicked="#salvar" styleClass="primary-button" text="Salvar Alterações" />
             </HBox>

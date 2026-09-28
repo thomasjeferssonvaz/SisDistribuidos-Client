@@ -56,6 +56,7 @@ public class LoginController extends BaseController implements Initializable {
         isRegister = false;
         registerBox.setVisible(false);
         registerBox.setManaged(false);
+
     }
 
     public void logar() {
@@ -98,7 +99,7 @@ public class LoginController extends BaseController implements Initializable {
                             System.out.println("Received pré Gson: " + loginResponse);
                             JsonObject jsonObject = loginResponse.data().getAsJsonObject();
                             String token = jsonObject.get("token").getAsString();
-                            User user = new User("", "", token);
+                            User user = User.user("", "", token);
 
                             if (user.token() != null) {
                                 Toast.show(toast, loginResponse.message(), Toast.Type.SUCCESS);

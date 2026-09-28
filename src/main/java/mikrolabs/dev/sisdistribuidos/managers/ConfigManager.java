@@ -52,7 +52,7 @@ public class ConfigManager {
     }
 
     public static synchronized String getToken() {
-        return properties.getProperty("Token", "notloggedin");
+        return properties.getProperty("Token", null);
     }
 
     public static synchronized void clearToken() {

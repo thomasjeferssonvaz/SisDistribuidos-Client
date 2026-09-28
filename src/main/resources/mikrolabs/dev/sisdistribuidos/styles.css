@@ -57,6 +57,12 @@
     -fx-font-weight: 600;
 }
 
+.section-header-label {
+    -fx-text-fill: #89b4fa;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
 .feedback-label {
     -fx-text-fill: #f38ba8;
     -fx-font-size: 12px;
@@ -80,6 +86,11 @@
     -fx-padding: 22px 28px;
 }
 
+.section-separator .line {
+    -fx-border-color: #313244;
+    -fx-border-width: 0.5px;
+}
+
 /* ==========================================================================
    INPUTS (TextField & PasswordField)
    ========================================================================== */
@@ -99,6 +110,15 @@
     -fx-border-color: #89b4fa;
     -fx-background-color: #1e1e2e;
     -fx-effect: dropshadow(gaussian, rgba(137, 180, 250, 0.25), 8, 0.2, 0, 0);
+}
+
+/* Campo Desativado / Somente Leitura (Username) */
+/* Classe customizada para campos somente leitura */
+.text-field.readonly-field, .text-field:readonly {
+    -fx-background-color: #11111b;
+    -fx-text-fill: #6c7086;
+    -fx-border-color: #313244;
+    -fx-cursor: text;
 }
 
 /* ==========================================================================
