@@ -11,6 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mikrolabs.dev.sisdistribuidos.DTOs.Request;
@@ -53,6 +55,21 @@ public class LoginController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Platform.runLater(() -> {
+            if (loginBox.getScene() != null) {
+                loginBox.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (event.getCode() == KeyCode.ENTER) {
+                        // Verifica qual card está visível no momento
+                        if (loginBox.isVisible()) {
+                            logar();
+                        } else if (registerBox.isVisible()) {
+                            registrar();
+                        }
+                        event.consume(); // Previne comportamentos indesejados
+                    }
+                });
+            }
+        });
         isRegister = false;
         registerBox.setVisible(false);
         registerBox.setManaged(false);
@@ -64,15 +81,12 @@ public class LoginController extends BaseController implements Initializable {
         String password = passwordTextBox.getText();
         Stage toast = (Stage) enviarBtn.getScene().getWindow();
 
-
-
         if(username.isEmpty() || password.isEmpty()) {
             Toast.show(toast, "Preencha todos os campos!", Toast.Type.INFO);
             return;
         }
 
         enviarBtn.setDisable(true);
-
 
         new Thread(() -> {
             try {
@@ -96,14 +110,15 @@ public class LoginController extends BaseController implements Initializable {
 
                     if (isSuccess && loginResponse.data() != null) {
                         try {
-                            System.out.println("Received pré Gson: " + loginResponse);
+                            //System.out.println("Received pré Gson: " + loginResponse);
                             JsonObject jsonObject = loginResponse.data().getAsJsonObject();
                             String token = jsonObject.get("token").getAsString();
                             User user = User.user("", "", token);
 
                             if (user.token() != null) {
                                 Toast.show(toast, loginResponse.message(), Toast.Type.SUCCESS);
-                                ConfigManager.saveToken(user.token());
+                                ConfigManager.saveVariable("Token", user.token());
+                                ConfigManager.saveVariable("Username", username);
                                 mudarTela();
                             }
                         } catch (IOException e) {
@@ -132,6 +147,7 @@ public class LoginController extends BaseController implements Initializable {
     public void switchMode() {
         isRegister = !isRegister;
         atualizarVisibilidade();
+
     }
 
     private void atualizarVisibilidade() {

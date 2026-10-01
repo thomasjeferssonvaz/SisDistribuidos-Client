@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="480.0" prefWidth="500.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.ProfileController">
+<AnchorPane prefHeight="580.0" prefWidth="500.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.ProfileController">
 
     <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <padding>
@@ -29,6 +29,11 @@
                 <TextField fx:id="usernameField" editable="false" focusTraversable="false" styleClass="readonly-field" promptText="username" />
             </VBox>
 
+            <!-- Botão de Salvar Perfil (Apenas Nome) -->
+            <HBox alignment="CENTER_RIGHT">
+                <Button mnemonicParsing="false" onAction="#salvarPerfil" styleClass="primary-button" text="Salvar Perfil" />
+            </HBox>
+
             <Separator styleClass="section-separator" />
 
             <!-- Seção de Reset de Senha -->
@@ -44,16 +49,25 @@
                     <Label styleClass="field-label" text="Nova Senha" />
                     <PasswordField fx:id="newPasswordField" promptText="********" />
                 </VBox>
+
+                <VBox spacing="6.0">
+                    <Label styleClass="field-label" text="Repita a Nova Senha" />
+                    <PasswordField fx:id="confirmNewPasswordField" promptText="********" />
+                </VBox>
+
+                <HBox alignment="CENTER_RIGHT">
+                    <padding>
+                        <Insets top="4.0" />
+                    </padding>
+                    <Button mnemonicParsing="false" onAction="#alterarSenha" styleClass="secondary-button" text="Alterar Senha" />
+                </HBox>
             </VBox>
 
-            <!-- Botões de Ação -->
-            <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                <padding>
-                    <Insets top="8.0" />
-                </padding>
+            <Separator styleClass="section-separator" />
+
+            <!-- Rodapé / Desconectar -->
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <Button fx:id="logoutButton" onAction="#deslogar" styleClass="danger-button" text="Desconectar" />
-                <Region HBox.hgrow="ALWAYS" />
-                <Button mnemonicParsing="false" onAction="#salvar" styleClass="primary-button" text="Salvar Alterações" />
             </HBox>
         </VBox>
     </VBox>

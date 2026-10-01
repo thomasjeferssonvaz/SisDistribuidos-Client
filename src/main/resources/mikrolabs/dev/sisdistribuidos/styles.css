@@ -150,6 +150,39 @@
     -fx-opacity: 0.8;
 }
 
+/* Botão Secundário (Alterar Senha, Ações Complementares) */
+.secondary-button {
+    -fx-background-color: rgba(203, 166, 247, 0.12);
+    -fx-border-color: #cba6f7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #cba6f7;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-padding: 9px 18px;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #cba6f7;
+    -fx-text-fill: #11111b;
+    -fx-effect: dropshadow(gaussian, rgba(203, 166, 247, 0.25), 6, 0.1, 0, 2);
+}
+
+.secondary-button:pressed {
+    -fx-background-color: #b4befe;
+    -fx-border-color: #b4befe;
+    -fx-text-fill: #11111b;
+}
+
+.secondary-button:disabled {
+    -fx-background-color: transparent;
+    -fx-border-color: #45475a;
+    -fx-text-fill: #6c7086;
+    -fx-opacity: 0.7;
+}
+
 /* Botão de Perigo/Destrutivo (Deslogar) */
 .danger-button {
     -fx-background-color: rgba(243, 139, 168, 0.15);

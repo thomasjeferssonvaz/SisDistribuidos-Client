@@ -49,7 +49,7 @@ public class SocketManager {
 
 
             System.out.println("Received: " + jsonReceived);
-            System.out.println("Parsed:   [Status: " + response.statusCode() + ", Result: " + response.message() + ", Data: "+ response.data() + ", Error: " + "]\n");
+            System.out.println("Parsed:   [Status: " + response.statusCode() + ", Result: " + response.message() + ", Data: "+ response.data() + "\n");
 
             return response;
         } catch (SocketTimeoutException e) {

@@ -40,16 +40,38 @@ public class ConfigManager {
         persist();
     }
 
-    public static synchronized void saveToken(String token) {
-        if (token == null || token.isBlank()) {
-            properties.remove("Token");
-            System.out.println("Token removido com sucesso!");
+//    public static synchronized void saveToken(String token) {
+//        if (token == null || token.isBlank()) {
+//            properties.remove("Token");
+//            System.out.println("Token removido com sucesso!");
+//        } else {
+//            properties.setProperty("Token", token);
+//            System.out.println("Token salvo com sucesso!");
+//        }
+//        persist();
+//    }
+
+    public static synchronized void saveVariable(String fieldName, String value) {
+        if (value == null || value.isBlank()) {
+            properties.remove(fieldName);
+            System.out.println(fieldName + " removido com sucesso!");
         } else {
-            properties.setProperty("Token", token);
-            System.out.println("Token salvo com sucesso!");
+            properties.setProperty(fieldName, value);
+            System.out.println(fieldName + " salvo com sucesso!");
         }
         persist();
     }
+
+    public static synchronized String getUsername() {
+        return properties.getProperty("Username", null);
+    }
+
+    public static synchronized void clearUsername() {
+        properties.remove("Username");
+        System.out.println("Username removido com sucesso!");
+        persist();
+    }
+
 
     public static synchronized String getToken() {
         return properties.getProperty("Token", null);
