@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="540.0" prefWidth="540.0" styleClass="main-background"
+            stylesheets="@../styles.css"
+            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mikrolabs.dev.sisdistribuidos.controllers.DeleteConfirmationController">
+    <VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <padding>
+            <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+        </padding>
+
+        <VBox maxWidth="490.0" spacing="18.0" styleClass="auth-card">
+            <VBox spacing="6.0">
+                <Label styleClass="card-title" text="Excluir sua conta?" wrapText="true" />
+                <Label styleClass="card-subtitle" text="Confirme a exclusão permanente do seu usuário."
+                       wrapText="true" />
+            </VBox>
+
+            <Separator styleClass="section-separator" />
+
+            <VBox spacing="8.0" styleClass="delete-warning-box">
+                <Label text="Esta ação não pode ser desfeita."
+                       styleClass="delete-warning-title"
+                       wrapText="true" />
+                <Label styleClass="card-subtitle"
+                       text="Ao continuar, sua conta será excluída permanentemente e você perderá o acesso a ela."
+                       wrapText="true" />
+            </VBox>
+
+            <VBox spacing="8.0">
+                <Label styleClass="field-label" text="Conta que será excluída" />
+                <Label fx:id="accountUsernameLabel" text="nome-do-usuário" maxWidth="Infinity"
+                       styleClass="delete-account-username"
+                       wrapText="true" />
+            </VBox>
+
+            <VBox spacing="8.0">
+                <Label styleClass="field-label" text="Para confirmar, digite o nome de usuário acima."
+                       wrapText="true" labelFor="$confirmationUsernameField" />
+                <TextField fx:id="confirmationUsernameField" promptText="Digite seu nome de usuário"
+                           accessibleText="Nome de usuário para confirmar a exclusão" />
+                <Label fx:id="confirmationFeedbackLabel" styleClass="feedback-label"
+                       text="O nome deve corresponder exatamente ao usuário da conta."
+                       wrapText="true" />
+            </VBox>
+
+            <Separator styleClass="section-separator" />
+
+            <!-- Estrutura visual: os eventos e a validação serão conectados pelo controller. -->
+            <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                <Button fx:id="cancelButton" onAction="#cancelar" text="Cancelar" cancelButton="true"
+                        mnemonicParsing="false" styleClass="secondary-button" />
+                <Button fx:id="confirmDeleteButton" text="Excluir minha conta" disable="true"
+                        mnemonicParsing="false" onAction="#deleteAccount" styleClass="danger-button" />
+            </HBox>
+        </VBox>
+    </VBox>
+</AnchorPane>

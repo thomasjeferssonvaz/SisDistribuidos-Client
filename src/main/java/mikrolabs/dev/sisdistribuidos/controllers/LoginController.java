@@ -2,7 +2,6 @@ package mikrolabs.dev.sisdistribuidos.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,12 +16,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import mikrolabs.dev.sisdistribuidos.DTOs.Request;
 import mikrolabs.dev.sisdistribuidos.DTOs.Response;
-import mikrolabs.dev.sisdistribuidos.DTOs.User;
 import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
 import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
 import mikrolabs.dev.sisdistribuidos.utils.Toast;
+import mikrolabs.dev.sisdistribuidos.utils.FieldValidation;
+import mikrolabs.dev.sisdistribuidos.utils.LoginResponseValidation;
 
 import java.io.IOException;
 import java.net.URL;
@@ -77,7 +77,8 @@ public class LoginController extends BaseController implements Initializable {
     }
 
     public void logar() {
-        String username =  usernameTextBox.getText().trim();
+        if (enviarBtn.isDisabled()) return;
+        String username =  usernameTextBox.getText();
         String password = passwordTextBox.getText();
         Stage toast = (Stage) enviarBtn.getScene().getWindow();
 
@@ -86,6 +87,7 @@ public class LoginController extends BaseController implements Initializable {
             return;
         }
 
+        if (!validCredentials(toast, username, password)) return;
         enviarBtn.setDisable(true);
 
         new Thread(() -> {
@@ -101,31 +103,22 @@ public class LoginController extends BaseController implements Initializable {
                 }
 
                 Platform.runLater(() -> {
-                    enviarBtn.setDisable(false);
-                    if (loginResponse.data() == null) {
-                        Toast.show(toast, loginResponse.message(), Toast.Type.ERROR);
-                    }
-
-                    boolean isSuccess = loginResponse.statusCode() == 200;
-
-                    if (isSuccess && loginResponse.data() != null) {
-                        try {
-                            //System.out.println("Received pré Gson: " + loginResponse);
-                            JsonObject jsonObject = loginResponse.data().getAsJsonObject();
-                            String token = jsonObject.get("token").getAsString();
-                            User user = User.user("", "", token);
-
-                            if (user.token() != null) {
-                                Toast.show(toast, loginResponse.message(), Toast.Type.SUCCESS);
-                                ConfigManager.saveVariable("Token", user.token());
-                                ConfigManager.saveVariable("Username", username);
-                                mudarTela();
-                            }
-                        } catch (IOException e) {
-                            Toast.show(toast, "Erro ao processar dados da sessão.", Toast.Type.INFO);
+                    try {
+                        if (loginResponse.statusCode() != 200) {
+                            Toast.show(toast, loginResponse.message(), Toast.Type.ERROR);
+                            return;
                         }
-                    } else {
-                        Toast.show(toast, loginResponse.message(), Toast.Type.ERROR);
+                        String token = LoginResponseValidation.extractToken(loginResponse);
+                        ConfigManager.saveVariable("Token", token);
+                        ConfigManager.saveVariable("Username", username);
+                        mudarTela();
+                        Toast.show(toast, loginResponse.message(), Toast.Type.SUCCESS);
+                    } catch (IllegalArgumentException e) {
+                        Toast.show(toast, "Resposta de login inválida: token ausente ou fora do formato UUID.", Toast.Type.ERROR);
+                    } catch (IOException e) {
+                        Toast.show(toast, "Não foi possível abrir a tela principal.", Toast.Type.ERROR);
+                    } finally {
+                        enviarBtn.setDisable(false);
                     }
                 });
             } catch (ServerConnectionError serverConnectionError) {
@@ -167,8 +160,9 @@ public class LoginController extends BaseController implements Initializable {
     }
 
     public void registrar() {
-        String name = nameRegisterTextBox.getText().trim();
-        String username =  usernameRegisterTextBox.getText().trim();
+        if (enviarRegisterBtn.isDisabled()) return;
+        String name = nameRegisterTextBox.getText();
+        String username =  usernameRegisterTextBox.getText();
         String password = passwordRegisterTextBox.getText();
         Stage toast = (Stage) enviarRegisterBtn.getScene().getWindow();
 
@@ -176,6 +170,11 @@ public class LoginController extends BaseController implements Initializable {
             Toast.show(toast, "Preencha todos os campos!", Toast.Type.INFO);
             return;
         }
+        if (!FieldValidation.validName(name)) {
+            Toast.show(toast, "Nome: use apenas letras e espaços, entre 1 e 60 caracteres.", Toast.Type.INFO);
+            return;
+        }
+        if (!validCredentials(toast, username, password)) return;
         enviarRegisterBtn.setDisable(true);
 
         new Thread(() -> {
@@ -195,7 +194,7 @@ public class LoginController extends BaseController implements Initializable {
                 Platform.runLater(() -> {
                     enviarRegisterBtn.setDisable(false);
 
-                    boolean isSuccess = registerResponse.statusCode() == 200;
+                    boolean isSuccess = registerResponse.statusCode() == 201;
 
                     if (isSuccess) {
                         try {
@@ -224,4 +223,15 @@ public class LoginController extends BaseController implements Initializable {
     }
 
 
+    private boolean validCredentials(Stage stage, String username, String password) {
+        if (!FieldValidation.validUsername(username)) {
+            Toast.show(stage, "Username: use 3–20 caracteres, com letras minúsculas, números, ponto ou sublinhado.", Toast.Type.INFO);
+            return false;
+        }
+        if (!FieldValidation.validPassword(password)) {
+            Toast.show(stage, "Senha: use 8–20 caracteres, incluindo maiúscula, minúscula, número e símbolo permitido (# . * & % $ @ ! ( ) - _ = +).", Toast.Type.INFO);
+            return false;
+        }
+        return true;
+    }
 }

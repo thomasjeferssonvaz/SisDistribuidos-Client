@@ -240,6 +240,30 @@
 /* ==========================================================================
    NOTIFICAÇÕES TOAST
    ========================================================================== */
+/* Confirmação de exclusão da conta */
+.delete-warning-box {
+    -fx-background-color: rgba(243, 139, 168, 0.10);
+    -fx-border-color: #f38ba8;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 14px;
+}
+
+.delete-warning-title {
+    -fx-text-fill: #f38ba8;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.delete-account-username {
+    -fx-text-fill: #cdd6f4;
+    -fx-font-family: monospace;
+    -fx-font-size: 14px;
+    -fx-background-color: #181825;
+    -fx-background-radius: 6px;
+    -fx-padding: 10px 12px;
+}
+
 .toast-container {
     -fx-font-size: 13px;
     -fx-font-weight: 600;

@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -20,6 +21,7 @@ import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
 import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
 import mikrolabs.dev.sisdistribuidos.utils.Toast;
+import mikrolabs.dev.sisdistribuidos.utils.FieldValidation;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,6 +32,7 @@ public class ProfileController extends BaseController implements Initializable {
 
     @FXML
     public Button logoutButton;
+    public Button deleteAccountButton;
 
     @FXML
     private TextField nameField;
@@ -50,6 +53,7 @@ public class ProfileController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         loadUserData();
     }
 
@@ -102,8 +106,8 @@ public class ProfileController extends BaseController implements Initializable {
         Stage toast = (Stage) logoutButton.getScene().getWindow();
         String novoNome = nameField.getText();
 
-        if (novoNome == null || novoNome.trim().isEmpty()) {
-            Toast.show(toast, "O campo Nome não pode ficar vazio.", Toast.Type.INFO);
+        if (!FieldValidation.validName(novoNome)) {
+            Toast.show(toast, "Nome: use apenas letras e espaços, entre 1 e 60 caracteres.", Toast.Type.INFO);
             return;
         }
 
@@ -155,6 +159,10 @@ public class ProfileController extends BaseController implements Initializable {
             return;
         }
 
+        if (!FieldValidation.validPassword(senhaAtual) || !FieldValidation.validPassword(novaSenha)) {
+            Toast.show(toast, "Senha: use 8–20 caracteres, incluindo maiúscula, minúscula, número e símbolo permitido (# . * & % $ @ ! ( ) - _ = +).", Toast.Type.INFO);
+            return;
+        }
         if (!novaSenha.equals(confirmaNovaSenha)) {
             Toast.show(toast, "A nova senha e a confirmação não coincidem.", Toast.Type.ERROR);
             return;
@@ -165,56 +173,108 @@ public class ProfileController extends BaseController implements Initializable {
             return;
         }
 
-        // Enviar requisição para o servidor para alterar a senha
-        /*
         new Thread(() -> {
-            JsonElement data = gson.toJsonTree(Map.of(
-                "token", ConfigManager.getToken(),
-                "currentPassword", senhaAtual,
-                "newPassword", novaSenha
-            ));
-            Response response = SocketManager.sendRequest(new Request("UpdateUserPassword", data));
-            ...
+            try {
+                JsonElement data = gson.toJsonTree(Map.of(
+                        "token", ConfigManager.getToken(),
+                        "username", ConfigManager.getUsername(),
+                        "oldPassword", senhaAtual,
+                        "newPassword", novaSenha
+                ));
+                Response updateUserPasswordResponse = SocketManager.sendRequest(new Request("updateuserpassword", data));
+                if (updateUserPasswordResponse == null) throw new ServerConnectionError();
+
+                Platform.runLater(() -> {
+                    boolean isSuccess = updateUserPasswordResponse.statusCode() == 200;
+
+                    if (isSuccess) {
+                        Toast.show(toast, "Senha atualizado com sucesso!", Toast.Type.SUCCESS);
+                        loadUserData();
+
+                        currentPasswordField.clear();
+                        newPasswordField.clear();
+                        confirmNewPasswordField.clear();
+                    } else {
+                        Toast.show(toast, updateUserPasswordResponse.message(), Toast.Type.ERROR);
+                    }
+
+                });
+
+
+            } catch (ServerConnectionError serverConnectionError) {
+                Platform.runLater(() -> {
+                    Toast.show(toast, serverConnectionError.getMessage(), Toast.Type.ERROR);
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR);
+                });
+            }
         }).start();
-        */
-
-        Toast.show(toast, "Senha alterada com sucesso!", Toast.Type.SUCCESS);
-
-        currentPasswordField.clear();
-        newPasswordField.clear();
-        confirmNewPasswordField.clear();
     }
+
 
     @FXML
     public void deslogar(ActionEvent mouseEvent) {
-        Stage toast = (Stage) logoutButton.getScene().getWindow();
+        if (logoutButton.isDisabled()) return;
+        Stage profileStage = (Stage) logoutButton.getScene().getWindow();
+        Stage mainStage = (Stage) profileStage.getOwner();
         String token = ConfigManager.getToken();
-        Response logoutResponse;
-
-        if (token != null) {
-            JsonElement data = gson.toJsonTree(Map.of("token", token));
-            logoutResponse = SocketManager.sendRequest(new Request("logout", data));
+        if (token == null || token.isBlank()) {
             ConfigManager.clearToken();
-        } else {
-            logoutResponse = Response.error(400, "User não está logado");
+            ConfigManager.clearUsername();
+            profileStage.close();
+            sendToLoginScreen(mainStage, Response.error(400, "Token de autenticação não fornecido."));
+            return;
         }
+        logoutButton.setDisable(true);
+        new Thread(() -> {
+            try {
+                Response response = SocketManager.sendRequest(new Request("logout",
+                        gson.toJsonTree(Map.of("token", token))));
+                Platform.runLater(() -> {
+                    try {
+                        if (response.statusCode() == 200 || response.statusCode() == 401) {
+                            ConfigManager.clearToken();
+                            ConfigManager.clearUsername();
+                            profileStage.close();
+                            sendToLoginScreen(mainStage, response);
+                        } else {
+                            Toast.show(profileStage, response.message(), Toast.Type.ERROR);
+                        }
+                    } finally {
+                        logoutButton.setDisable(false);
+                    }
+                });
+            } catch (ServerConnectionError e) {
+                Platform.runLater(() -> {
+                    logoutButton.setDisable(false);
+                    Toast.show(profileStage, e.getMessage(), Toast.Type.ERROR);
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    logoutButton.setDisable(false);
+                    Toast.show(profileStage, "Erro inesperado na comunicação ao deslogar.", Toast.Type.ERROR);
+                });
+            }
+        }).start();
+    }
 
-        if (logoutResponse != null && logoutResponse.statusCode() == 200) {
-            Toast.show(toast, logoutResponse.message(), Toast.Type.SUCCESS);
-        } else if (logoutResponse != null) {
-            Toast.show(toast, logoutResponse.message(), Toast.Type.ERROR);
-        }
-
-        Stage modalStage = (Stage) ((Node) mouseEvent.getSource()).getScene().getWindow();
-        Stage ownerStage = (Stage) modalStage.getOwner();
-
-        modalStage.close();
-
+    protected static void sendToLoginScreen(Stage mainStage, Response response) {
         try {
-            NavigationUtils.navigateTo(ownerStage, "views/Login.fxml", "Login");
+            NavigationUtils.navigateTo(mainStage, "views/Login.fxml", "Login");
+            if (response != null) {
+                Toast.Type type = response.statusCode() == 200 ? Toast.Type.SUCCESS : Toast.Type.ERROR;
+                Toast.show(mainStage, response.message(), type);
+            }
         } catch (IOException e) {
             System.err.println("Erro ao carregar tela de login: " + e.getMessage());
         }
-        ConfigManager.clearUsername();
+    }
+
+    @FXML
+    private void telaConfirmacaoDelete(ActionEvent event) {
+        Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        NavigationUtils.openDeleteConfirmationModal(currentStage);
     }
 }

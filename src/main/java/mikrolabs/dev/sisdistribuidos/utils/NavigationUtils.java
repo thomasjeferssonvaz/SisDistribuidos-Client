@@ -79,4 +79,28 @@ public final class NavigationUtils {
             e.printStackTrace();
         }
     }
+
+    public static void openDeleteConfirmationModal(Stage ownerStage) {
+        try {
+            FXMLLoader loader = new FXMLLoader(ClientApplication.class.getResource("views/DeleteConfirmationView.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Delete Confirmation");
+
+            Scene scene = new Scene(root);
+            var cssResource = ClientApplication.class.getResource("styles.css");
+            if (cssResource != null) {
+                scene.getStylesheets().add(cssResource.toExternalForm());
+            }
+
+            stage.setScene(scene);
+            stage.initOwner(ownerStage);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.show();
+        } catch (IOException e) {
+            System.err.println("Erro ao abrir Profile: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
