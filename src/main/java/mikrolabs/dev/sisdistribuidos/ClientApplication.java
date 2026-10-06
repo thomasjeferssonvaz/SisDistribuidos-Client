@@ -10,8 +10,10 @@ import java.io.IOException;
 public class ClientApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        String token = ConfigManager.getToken();
-        boolean isLoggedIn = token != null;
+        boolean isLoggedIn = ConfigManager.hasSession();
+        if (!isLoggedIn) {
+            ConfigManager.clearSession();
+        }
 
         String viewPath = isLoggedIn ? "views/MainPage.fxml" : "views/Login.fxml";
         String title = isLoggedIn ? "Client" : "Login";

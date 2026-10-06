@@ -19,8 +19,7 @@ public class BaseController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         if (profileBtn != null) {
-            String token = ConfigManager.getToken();
-            boolean isLoggedIn = (token != null);
+            boolean isLoggedIn = ConfigManager.hasSession();
 
             profileBtn.setVisible(isLoggedIn);
             profileBtn.setManaged(isLoggedIn);

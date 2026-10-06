@@ -77,6 +77,21 @@ public class ConfigManager {
         return properties.getProperty("Token", null);
     }
 
+    public static synchronized boolean hasSession() {
+        return hasSession(getToken(), getUsername());
+    }
+
+    public static boolean hasSession(String token, String username) {
+        return token != null && !token.isBlank()
+                && username != null && !username.isBlank();
+    }
+
+    public static synchronized void clearSession() {
+        properties.remove("Token");
+        properties.remove("Username");
+        persist();
+    }
+
     public static synchronized void clearToken() {
         properties.remove("Token");
         System.out.println("Token removido com sucesso!");

@@ -2,7 +2,6 @@ package mikrolabs.dev.sisdistribuidos.controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,15 +14,15 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import mikrolabs.dev.sisdistribuidos.DTOs.Request;
 import mikrolabs.dev.sisdistribuidos.DTOs.Response;
-import mikrolabs.dev.sisdistribuidos.DTOs.User;
 import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
 import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
 import mikrolabs.dev.sisdistribuidos.utils.Toast;
 import mikrolabs.dev.sisdistribuidos.utils.FieldValidation;
+import mikrolabs.dev.sisdistribuidos.utils.ProfileResponseValidation;
+import mikrolabs.dev.sisdistribuidos.utils.SessionUtils;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -53,16 +52,23 @@ public class ProfileController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        usernameField.setText(ConfigManager.getUsername());
         loadUserData();
     }
 
     private void loadUserData() {
+        String token = ConfigManager.getToken();
+        String username = ConfigManager.getUsername();
+        if (!ConfigManager.hasSession(token, username)) {
+            Platform.runLater(() -> SessionUtils.ensureSession(getProfileStage(), token, username));
+            return;
+        }
+
         new Thread(() -> {
             try {
                 JsonElement data = gson.toJsonTree(Map.of(
-                        "token", ConfigManager.getToken(),
-                        "username", ConfigManager.getUsername()
+                        "token", token,
+                        "username", username
                         ));
                 Response getUserResponse = SocketManager.sendRequest(new Request("getuser", data));
 
@@ -70,31 +76,39 @@ public class ProfileController extends BaseController implements Initializable {
                     throw new ServerConnectionError();
                 }
 
-                Platform.runLater(() -> {
-                    boolean isSuccess = getUserResponse.statusCode() == 200;
+                var profileData = getUserResponse.statusCode() == 200
+                        ? ProfileResponseValidation.readData(getUserResponse.data()) : null;
 
-                    if (isSuccess && getUserResponse.data() != null) {
-                        JsonObject jsonObject = getUserResponse.data().getAsJsonObject();
-                        User currentUser = gson.fromJson(jsonObject, User.class);
-                        if (currentUser != null) {
-                            nameField.setText(currentUser.name());
-                            usernameField.setText(currentUser.username());
-                            usernameField.setEditable(false);
+                Platform.runLater(() -> {
+                    Stage toast = getProfileStage();
+                    if (!toast.isShowing() || SessionUtils.handleExpiredSession(toast, getUserResponse)) {
+                        return;
+                    }
+
+                    if (getUserResponse.statusCode() == 200) {
+                        if (profileData == null) {
+                            Toast.show(toast, "Não foi possível carregar os dados do perfil.", Toast.Type.INFO);
+                            return;
+                        }
+                        if (profileData.name() != null) {
+                            nameField.setText(profileData.name());
+                        }
+                        if (profileData.username() != null) {
+                            usernameField.setText(profileData.username());
                         }
                     } else {
-                        Stage toast = (Stage) logoutButton.getScene().getWindow();
                         Toast.show(toast, getUserResponse.message(), Toast.Type.ERROR);
                     }
                 });
             } catch (ServerConnectionError serverConnectionError) {
                 Platform.runLater(() -> {
-                    Stage toast = (Stage) logoutButton.getScene().getWindow();
+                    Stage toast = getProfileStage();
                     Toast.show(toast, serverConnectionError.getMessage(), Toast.Type.ERROR);
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     System.out.println(e.getMessage());
-                    Stage toast = (Stage) logoutButton.getScene().getWindow();
+                    Stage toast = getProfileStage();
                     Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR);
                 });
             }
@@ -103,7 +117,10 @@ public class ProfileController extends BaseController implements Initializable {
 
     @FXML
     private void salvarPerfil() {
-        Stage toast = (Stage) logoutButton.getScene().getWindow();
+        Stage toast = getProfileStage();
+        String token = ConfigManager.getToken();
+        String username = ConfigManager.getUsername();
+        if (!SessionUtils.ensureSession(toast, token, username)) return;
         String novoNome = nameField.getText();
 
         if (!FieldValidation.validName(novoNome)) {
@@ -114,8 +131,8 @@ public class ProfileController extends BaseController implements Initializable {
         new Thread(() -> {
             try {
                 JsonElement data = gson.toJsonTree(Map.of(
-                        "token", ConfigManager.getToken(),
-                        "username", ConfigManager.getUsername(),
+                        "token", token,
+                        "username", username,
                         "name", novoNome
                 ));
 
@@ -123,6 +140,9 @@ public class ProfileController extends BaseController implements Initializable {
                 if (updateUserNameResponse == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
+                    if (!toast.isShowing() || SessionUtils.handleExpiredSession(toast, updateUserNameResponse)) {
+                        return;
+                    }
                     boolean isSuccess = updateUserNameResponse.statusCode() == 200;
 
                     if (isSuccess) {
@@ -149,7 +169,10 @@ public class ProfileController extends BaseController implements Initializable {
 
     @FXML
     private void alterarSenha() {
-        Stage toast = (Stage) logoutButton.getScene().getWindow();
+        Stage toast = getProfileStage();
+        String token = ConfigManager.getToken();
+        String username = ConfigManager.getUsername();
+        if (!SessionUtils.ensureSession(toast, token, username)) return;
         String senhaAtual = currentPasswordField.getText();
         String novaSenha = newPasswordField.getText();
         String confirmaNovaSenha = confirmNewPasswordField.getText();
@@ -176,8 +199,8 @@ public class ProfileController extends BaseController implements Initializable {
         new Thread(() -> {
             try {
                 JsonElement data = gson.toJsonTree(Map.of(
-                        "token", ConfigManager.getToken(),
-                        "username", ConfigManager.getUsername(),
+                        "token", token,
+                        "username", username,
                         "oldPassword", senhaAtual,
                         "newPassword", novaSenha
                 ));
@@ -185,6 +208,9 @@ public class ProfileController extends BaseController implements Initializable {
                 if (updateUserPasswordResponse == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
+                    if (!toast.isShowing() || SessionUtils.handleExpiredSession(toast, updateUserPasswordResponse)) {
+                        return;
+                    }
                     boolean isSuccess = updateUserPasswordResponse.statusCode() == 200;
 
                     if (isSuccess) {
@@ -217,16 +243,10 @@ public class ProfileController extends BaseController implements Initializable {
     @FXML
     public void deslogar(ActionEvent mouseEvent) {
         if (logoutButton.isDisabled()) return;
-        Stage profileStage = (Stage) logoutButton.getScene().getWindow();
-        Stage mainStage = (Stage) profileStage.getOwner();
+        Stage profileStage = getProfileStage();
         String token = ConfigManager.getToken();
-        if (token == null || token.isBlank()) {
-            ConfigManager.clearToken();
-            ConfigManager.clearUsername();
-            profileStage.close();
-            sendToLoginScreen(mainStage, Response.error(400, "Token de autenticação não fornecido."));
-            return;
-        }
+        String username = ConfigManager.getUsername();
+        if (!SessionUtils.ensureSession(profileStage, token, username)) return;
         logoutButton.setDisable(true);
         new Thread(() -> {
             try {
@@ -234,11 +254,10 @@ public class ProfileController extends BaseController implements Initializable {
                         gson.toJsonTree(Map.of("token", token))));
                 Platform.runLater(() -> {
                     try {
+                        if (!profileStage.isShowing()) return;
                         if (response.statusCode() == 200 || response.statusCode() == 401) {
-                            ConfigManager.clearToken();
-                            ConfigManager.clearUsername();
-                            profileStage.close();
-                            sendToLoginScreen(mainStage, response);
+                            ConfigManager.clearSession();
+                            NavigationUtils.returnToLogin(profileStage, response);
                         } else {
                             Toast.show(profileStage, response.message(), Toast.Type.ERROR);
                         }
@@ -260,16 +279,8 @@ public class ProfileController extends BaseController implements Initializable {
         }).start();
     }
 
-    protected static void sendToLoginScreen(Stage mainStage, Response response) {
-        try {
-            NavigationUtils.navigateTo(mainStage, "views/Login.fxml", "Login");
-            if (response != null) {
-                Toast.Type type = response.statusCode() == 200 ? Toast.Type.SUCCESS : Toast.Type.ERROR;
-                Toast.show(mainStage, response.message(), type);
-            }
-        } catch (IOException e) {
-            System.err.println("Erro ao carregar tela de login: " + e.getMessage());
-        }
+    private Stage getProfileStage() {
+        return (Stage) logoutButton.getScene().getWindow();
     }
 
     @FXML

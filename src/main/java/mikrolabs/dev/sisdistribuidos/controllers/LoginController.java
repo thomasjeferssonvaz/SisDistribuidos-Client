@@ -82,12 +82,12 @@ public class LoginController extends BaseController implements Initializable {
         String password = passwordTextBox.getText();
         Stage toast = (Stage) enviarBtn.getScene().getWindow();
 
-        if(username.isEmpty() || password.isEmpty()) {
-            Toast.show(toast, "Preencha todos os campos!", Toast.Type.INFO);
+        if(username.isEmpty()) {
+            Toast.show(toast, "Informe o nome de usuário!", Toast.Type.INFO);
             return;
         }
 
-        if (!validCredentials(toast, username, password)) return;
+        if (!validUsername(toast, username)) return;
         enviarBtn.setDisable(true);
 
         new Thread(() -> {
@@ -223,11 +223,16 @@ public class LoginController extends BaseController implements Initializable {
     }
 
 
-    private boolean validCredentials(Stage stage, String username, String password) {
+    private boolean validUsername(Stage stage, String username) {
         if (!FieldValidation.validUsername(username)) {
             Toast.show(stage, "Username: use 3–20 caracteres, com letras minúsculas, números, ponto ou sublinhado.", Toast.Type.INFO);
             return false;
         }
+        return true;
+    }
+
+    private boolean validCredentials(Stage stage, String username, String password) {
+        if (!validUsername(stage, username)) return false;
         if (!FieldValidation.validPassword(password)) {
             Toast.show(stage, "Senha: use 8–20 caracteres, incluindo maiúscula, minúscula, número e símbolo permitido (# . * & % $ @ ! ( ) - _ = +).", Toast.Type.INFO);
             return false;

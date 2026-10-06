@@ -1,13 +1,18 @@
 package mikrolabs.dev.sisdistribuidos.utils;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import mikrolabs.dev.sisdistribuidos.ClientApplication;
+import mikrolabs.dev.sisdistribuidos.DTOs.Response;
+import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public final class NavigationUtils {
 
@@ -27,6 +32,41 @@ public final class NavigationUtils {
 
         stage.setTitle(title);
         stage.setScene(scene);
+    }
+
+    public static void returnToLogin(Stage source, Response response) {
+        if (source == null) return;
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(() -> returnToLogin(source, response));
+            return;
+        }
+
+        Stage mainStage = findMainStage(source);
+        for (Window window : new ArrayList<>(Window.getWindows())) {
+            if (window instanceof Stage stage && stage != mainStage
+                    && findMainStage(stage) == mainStage) {
+                stage.close();
+            }
+        }
+
+        try {
+            navigateTo(mainStage, "views/Login.fxml", "Login");
+            if (response != null) {
+                Toast.Type type = response.statusCode() == 200 ? Toast.Type.SUCCESS : Toast.Type.ERROR;
+                Toast.show(mainStage, response.message(), type);
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar tela de login: " + e.getMessage());
+            Toast.show(mainStage, "Não foi possível abrir a tela de login.", Toast.Type.ERROR);
+        }
+    }
+
+    private static Stage findMainStage(Stage source) {
+        Stage mainStage = source;
+        while (mainStage.getOwner() instanceof Stage owner) {
+            mainStage = owner;
+        }
+        return mainStage;
     }
 
     /**
@@ -57,6 +97,7 @@ public final class NavigationUtils {
     }
 
     public static void openProfileModal(Stage ownerStage) {
+        if (!SessionUtils.ensureSession(ownerStage, ConfigManager.getToken(), ConfigManager.getUsername())) return;
         try {
             FXMLLoader loader = new FXMLLoader(ClientApplication.class.getResource("views/ProfileView.fxml"));
             Parent root = loader.load();
@@ -81,6 +122,7 @@ public final class NavigationUtils {
     }
 
     public static void openDeleteConfirmationModal(Stage ownerStage) {
+        if (!SessionUtils.ensureSession(ownerStage, ConfigManager.getToken(), ConfigManager.getUsername())) return;
         try {
             FXMLLoader loader = new FXMLLoader(ClientApplication.class.getResource("views/DeleteConfirmationView.fxml"));
             Parent root = loader.load();

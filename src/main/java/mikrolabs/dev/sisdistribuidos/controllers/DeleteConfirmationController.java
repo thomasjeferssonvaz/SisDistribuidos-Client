@@ -15,6 +15,8 @@ import mikrolabs.dev.sisdistribuidos.DTOs.Response;
 import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
+import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
+import mikrolabs.dev.sisdistribuidos.utils.SessionUtils;
 import mikrolabs.dev.sisdistribuidos.utils.Toast;
 
 import java.net.URL;
@@ -45,7 +47,8 @@ public class DeleteConfirmationController implements Initializable {
 
         confirmationUsernameField.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    boolean matches = username != null
+                    boolean matches = ConfigManager.hasSession()
+                            && username != null
                             && !username.isBlank()
                             && username.equals(newValue);
 
@@ -56,6 +59,14 @@ public class DeleteConfirmationController implements Initializable {
                     confirmationFeedbackLabel.setManaged(showError);
                 }
         );
+
+        Platform.runLater(() -> {
+            if (confirmDeleteButton.getScene() != null
+                    && confirmDeleteButton.getScene().getWindow() instanceof Stage stage
+                    && stage.isShowing()) {
+                SessionUtils.ensureSession(stage, ConfigManager.getToken(), ConfigManager.getUsername());
+            }
+        });
     }
 
 
@@ -67,7 +78,13 @@ public class DeleteConfirmationController implements Initializable {
             return;
         }
 
-        if (confirmationUsernameField.getText().isEmpty() || !Objects.equals(confirmationUsernameField.getText(), ConfigManager.getUsername())) {
+        String token = ConfigManager.getToken();
+        String username = ConfigManager.getUsername();
+        if (!SessionUtils.ensureSession(toast, token, username)) {
+            return;
+        }
+
+        if (confirmationUsernameField.getText().isEmpty() || !Objects.equals(confirmationUsernameField.getText(), username)) {
             confirmationFeedbackLabel.setVisible(true);
             confirmationFeedbackLabel.setManaged(true);
             return;
@@ -81,8 +98,8 @@ public class DeleteConfirmationController implements Initializable {
             try {
 
                 JsonElement data = gson.toJsonTree(Map.of(
-                        "token", ConfigManager.getToken(),
-                        "username", ConfigManager.getUsername()
+                        "token", token,
+                        "username", username
                 ));
                 Response deleteUser = SocketManager.sendRequest(new Request("deleteuser", data));
 
@@ -91,23 +108,18 @@ public class DeleteConfirmationController implements Initializable {
                 }
 
                 Platform.runLater(() -> {
+                    if (!toast.isShowing()) {
+                        return;
+                    }
+                    if (SessionUtils.handleExpiredSession(toast, deleteUser)) {
+                        return;
+                    }
 
                     boolean isSuccess = deleteUser.statusCode() == 200;
 
                     if (isSuccess) {
-                        Stage confirmationStage =
-                                (Stage) confirmDeleteButton.getScene().getWindow();
-                        Stage profileStage = (Stage) confirmationStage.getOwner();
-                        Stage mainStage = (Stage) profileStage.getOwner();
-
-
-                        ConfigManager.clearToken();
-                        ConfigManager.clearUsername();
-
-                        confirmationStage.close();
-                        profileStage.close();
-
-                        ProfileController.sendToLoginScreen(mainStage, deleteUser);
+                        ConfigManager.clearSession();
+                        NavigationUtils.returnToLogin(toast, deleteUser);
                     } else {
                         Toast.show(toast, deleteUser.message(), Toast.Type.ERROR);
                         finalizarRequisicao();
@@ -115,13 +127,19 @@ public class DeleteConfirmationController implements Initializable {
                 });
             } catch (ServerConnectionError serverConnectionError) {
                 Platform.runLater(() -> {
+                    if (!toast.isShowing()) {
+                        return;
+                    }
                     Toast.show(toast, serverConnectionError.getMessage(), Toast.Type.ERROR);
                     finalizarRequisicao();
                 });
             } catch (Exception e) {
                 Platform.runLater(() -> {
+                    if (!toast.isShowing()) {
+                        return;
+                    }
                     System.out.println(e.getMessage());
-                    Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR);
+                    Toast.show(toast, "Erro inesperado na comunicação ao excluir usuário.", Toast.Type.ERROR);
                     finalizarRequisicao();
                 });
             }
@@ -133,7 +151,8 @@ public class DeleteConfirmationController implements Initializable {
         cancelButton.setDisable(false);
 
         String username = ConfigManager.getUsername();
-        boolean matches = username != null
+        boolean matches = ConfigManager.hasSession()
+                && username != null
                 && !username.isBlank()
                 && username.equals(confirmationUsernameField.getText());
 
