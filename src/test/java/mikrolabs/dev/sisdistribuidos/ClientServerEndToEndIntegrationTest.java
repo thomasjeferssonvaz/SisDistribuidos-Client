@@ -6,7 +6,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import mikrolabs.dev.sisdistribuidos.DTOs.Request;
 import mikrolabs.dev.sisdistribuidos.DTOs.Response;
 import mikrolabs.dev.sisdistribuidos.DTOs.User;
 import mikrolabs.dev.sisdistribuidos.DTOs.Vaga;
@@ -34,8 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * End-to-End TCP Client-Server integration test verifying that requests built by the Client DTOs
- * and transmitted via SocketManager are protocol-compliant across all 17 endpoints and that the
+ * End-to-End TCP Client-Server integration test verifying that requests built
+ * by the Client DTOs
+ * and transmitted via SocketManager are protocol-compliant across all 17
+ * endpoints and that the
  * Client validators accurately interpret all responses.
  */
 class ClientServerEndToEndIntegrationTest {
@@ -43,7 +44,6 @@ class ClientServerEndToEndIntegrationTest {
     private static final Gson gson = new GsonBuilder().serializeNulls().create();
 
     private ServerSocket serverSocket;
-    private Thread acceptThread;
     private String originalIp;
     private int originalPort;
 
@@ -68,7 +68,7 @@ class ClientServerEndToEndIntegrationTest {
         int port = serverSocket.getLocalPort();
         ConfigManager.save("127.0.0.1", String.valueOf(port));
 
-        acceptThread = new Thread(() -> {
+        Thread acceptThread = new Thread(() -> {
             while (!serverSocket.isClosed()) {
                 try {
                     Socket client = serverSocket.accept();
@@ -91,10 +91,13 @@ class ClientServerEndToEndIntegrationTest {
 
     private void handleClient(Socket client) {
         try (Socket s = client;
-             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));
-             PrintWriter out = new PrintWriter(new OutputStreamWriter(s.getOutputStream(), StandardCharsets.UTF_8), true)) {
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(s.getInputStream(), StandardCharsets.UTF_8));
+                PrintWriter out = new PrintWriter(new OutputStreamWriter(s.getOutputStream(), StandardCharsets.UTF_8),
+                        true)) {
             String line = in.readLine();
-            if (line == null) return;
+            if (line == null)
+                return;
             JsonObject req = JsonParser.parseString(line).getAsJsonObject();
             String method = req.get("method").getAsString();
             JsonObject data = req.get("data").getAsJsonObject();
@@ -121,7 +124,8 @@ class ClientServerEndToEndIntegrationTest {
             }
             case "register" -> {
                 String u = d.get("username").getAsString();
-                if (users.containsKey(u)) yield resp(409, "O username já está em uso.", null);
+                if (users.containsKey(u))
+                    yield resp(409, "O username já está em uso.", null);
                 String role = d.has("role") && !d.get("role").isJsonNull() ? d.get("role").getAsString() : "user";
                 Map<String, String> created = new HashMap<>();
                 created.put("name", d.get("name").getAsString());
@@ -134,7 +138,8 @@ class ClientServerEndToEndIntegrationTest {
             case "getuser" -> {
                 String u = d.get("username").getAsString();
                 Map<String, String> target = users.get(u);
-                if (target == null) yield resp(404, "Usuário não encontrado", null);
+                if (target == null)
+                    yield resp(404, "Usuário não encontrado", null);
                 JsonObject obj = new JsonObject();
                 obj.addProperty("name", target.get("name"));
                 obj.addProperty("username", target.get("username"));
@@ -177,7 +182,8 @@ class ClientServerEndToEndIntegrationTest {
             case "findvehicle" -> {
                 String plate = d.get("licensePlate").getAsString();
                 for (JsonObject v : vagas.values()) {
-                    if (!v.get("licensePlate").isJsonNull() && plate.equalsIgnoreCase(v.get("licensePlate").getAsString())) {
+                    if (!v.get("licensePlate").isJsonNull()
+                            && plate.equalsIgnoreCase(v.get("licensePlate").getAsString())) {
                         JsonObject loc = new JsonObject();
                         loc.addProperty("floor", v.get("floor").getAsInt());
                         loc.addProperty("spotName", v.get("spotName").getAsString());
@@ -239,7 +245,8 @@ class ClientServerEndToEndIntegrationTest {
         assertNotNull(adminProfile);
         assertEquals("admin", adminProfile.role());
 
-        Response createSpot = SocketManager.sendRequest(Vaga.createVagaRequest(adminToken, "E1", 2, "disponivel", "eletrico"));
+        Response createSpot = SocketManager
+                .sendRequest(Vaga.createVagaRequest(adminToken, "E1", 2, "disponivel", "eletrico"));
         assertEquals(201, createSpot.statusCode());
 
         // 2. User registers, logs in, creates electric vehicle, parks in E1
@@ -250,8 +257,7 @@ class ClientServerEndToEndIntegrationTest {
         String aliceToken = LoginResponseValidation.extractToken(aliceLogin);
 
         Response createVeh = SocketManager.sendRequest(
-                Vehicle.createVehicleRequest(aliceToken, "BYD", "Dolphin", "eletrico", "BYD1E11")
-        );
+                Vehicle.createVehicleRequest(aliceToken, "BYD", "Dolphin", "eletrico", "BYD1E11"));
         assertEquals(201, createVeh.statusCode());
 
         Response getVehs = SocketManager.sendRequest(Vehicle.getVehiclesRequest(aliceToken));
@@ -260,14 +266,12 @@ class ClientServerEndToEndIntegrationTest {
         assertEquals("BYD1E11", aliceVehicles.get(0).licensePlate());
 
         Response parkRes = SocketManager.sendRequest(
-                Vaga.updateVagaUserRequest(aliceToken, "E1", "ocupada", true, "BYD1E11")
-        );
+                Vaga.updateVagaUserRequest(aliceToken, "E1", "ocupada", true, "BYD1E11"));
         assertEquals(200, parkRes.statusCode());
 
         // 3. Admin renames E1 -> E10; Alice locates her vehicle and sees E10
         Response renameRes = SocketManager.sendRequest(
-                Vaga.updateVagaAdminRequest(adminToken, "E1", "E10", 2)
-        );
+                Vaga.updateVagaAdminRequest(adminToken, "E1", "E10", 2));
         assertEquals(200, renameRes.statusCode());
 
         Response findRes = SocketManager.sendRequest(Vaga.findVehicleRequest(aliceToken, "BYD1E11"));
@@ -288,4 +292,3 @@ class ClientServerEndToEndIntegrationTest {
         assertEquals(200, SocketManager.sendRequest(User.logoutRequest(aliceToken)).statusCode());
     }
 }
-
