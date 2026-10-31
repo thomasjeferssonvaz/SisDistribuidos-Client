@@ -1,30 +1,28 @@
 package mikrolabs.dev.sisdistribuidos.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import mikrolabs.dev.sisdistribuidos.DTOs.Request;
 import mikrolabs.dev.sisdistribuidos.DTOs.Response;
+import mikrolabs.dev.sisdistribuidos.DTOs.User;
 import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
-import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
-import mikrolabs.dev.sisdistribuidos.utils.Toast;
 import mikrolabs.dev.sisdistribuidos.utils.FieldValidation;
+import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
 import mikrolabs.dev.sisdistribuidos.utils.ProfileResponseValidation;
 import mikrolabs.dev.sisdistribuidos.utils.SessionUtils;
+import mikrolabs.dev.sisdistribuidos.utils.Toast;
 
 import java.net.URL;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ProfileController extends BaseController implements Initializable {
@@ -48,12 +46,20 @@ public class ProfileController extends BaseController implements Initializable {
     @FXML
     private PasswordField confirmNewPasswordField;
 
-    private final Gson gson = new Gson();
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         usernameField.setText(ConfigManager.getUsername());
         loadUserData();
+        Platform.runLater(() -> {
+            if (logoutButton != null && logoutButton.getScene() != null) {
+                logoutButton.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                    if (event.getCode() == KeyCode.ESCAPE && logoutButton.getScene().getWindow() instanceof Stage stage) {
+                        stage.close();
+                        event.consume();
+                    }
+                });
+            }
+        });
     }
 
     private void loadUserData() {
@@ -66,11 +72,7 @@ public class ProfileController extends BaseController implements Initializable {
 
         new Thread(() -> {
             try {
-                JsonElement data = gson.toJsonTree(Map.of(
-                        "token", token,
-                        "username", username
-                        ));
-                Response getUserResponse = SocketManager.sendRequest(new Request("getuser", data));
+                Response getUserResponse = SocketManager.sendRequest(User.getUserRequest(token, username));
 
                 if (getUserResponse == null) {
                     throw new ServerConnectionError();
@@ -95,6 +97,9 @@ public class ProfileController extends BaseController implements Initializable {
                         }
                         if (profileData.username() != null) {
                             usernameField.setText(profileData.username());
+                        }
+                        if (profileData.role() != null) {
+                            ConfigManager.saveRole(profileData.role());
                         }
                     } else {
                         Toast.show(toast, getUserResponse.message(), Toast.Type.ERROR);
@@ -130,13 +135,7 @@ public class ProfileController extends BaseController implements Initializable {
 
         new Thread(() -> {
             try {
-                JsonElement data = gson.toJsonTree(Map.of(
-                        "token", token,
-                        "username", username,
-                        "name", novoNome
-                ));
-
-                Response updateUserNameResponse = SocketManager.sendRequest(new Request("updateusername", data));
+                Response updateUserNameResponse = SocketManager.sendRequest(User.updateUserNameRequest(token, username, novoNome));
                 if (updateUserNameResponse == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
@@ -162,8 +161,6 @@ public class ProfileController extends BaseController implements Initializable {
                     Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR);
                 });
             }
-
-
         }).start();
     }
 
@@ -198,13 +195,8 @@ public class ProfileController extends BaseController implements Initializable {
 
         new Thread(() -> {
             try {
-                JsonElement data = gson.toJsonTree(Map.of(
-                        "token", token,
-                        "username", username,
-                        "oldPassword", senhaAtual,
-                        "newPassword", novaSenha
-                ));
-                Response updateUserPasswordResponse = SocketManager.sendRequest(new Request("updateuserpassword", data));
+                Response updateUserPasswordResponse = SocketManager.sendRequest(
+                        User.updateUserPasswordRequest(token, username, senhaAtual, novaSenha));
                 if (updateUserPasswordResponse == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
@@ -223,9 +215,7 @@ public class ProfileController extends BaseController implements Initializable {
                     } else {
                         Toast.show(toast, updateUserPasswordResponse.message(), Toast.Type.ERROR);
                     }
-
                 });
-
 
             } catch (ServerConnectionError serverConnectionError) {
                 Platform.runLater(() -> {
@@ -239,7 +229,6 @@ public class ProfileController extends BaseController implements Initializable {
         }).start();
     }
 
-
     @FXML
     public void deslogar(ActionEvent mouseEvent) {
         if (logoutButton.isDisabled()) return;
@@ -250,8 +239,7 @@ public class ProfileController extends BaseController implements Initializable {
         logoutButton.setDisable(true);
         new Thread(() -> {
             try {
-                Response response = SocketManager.sendRequest(new Request("logout",
-                        gson.toJsonTree(Map.of("token", token))));
+                Response response = SocketManager.sendRequest(User.logoutRequest(token));
                 Platform.runLater(() -> {
                     try {
                         if (!profileStage.isShowing()) return;

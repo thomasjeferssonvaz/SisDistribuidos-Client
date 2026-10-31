@@ -2,6 +2,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+dependency-reduced-pom.xml
 .kotlin
 
 ### IntelliJ IDEA ###
@@ -9,6 +10,7 @@ target/
 *.iws
 *.iml
 *.ipr
+out/
 
 ### Eclipse ###
 .apt_generated
@@ -32,11 +34,23 @@ build/
 ### VS Code ###
 .vscode/
 
-### Mac OS ###
+### OS & JVM Temp Files ###
 .DS_Store
+Thumbs.db
+Desktop.ini
+hs_err_pid*
+replay_pid*
+*.tmp
+*.log
 
-### Aplicação & Configurações Locais ###
+### Aplicação, Persistência Local & Documentos de Auditoria ###
 config.properties
 config-*.properties
 *.properties
 !**/src/main/resources/**/*.properties
+!**/src/test/resources/**/*.properties
+config.txt
+/data/
+data/
+TODO.md
+TEST_AUDIT_REPORT.md

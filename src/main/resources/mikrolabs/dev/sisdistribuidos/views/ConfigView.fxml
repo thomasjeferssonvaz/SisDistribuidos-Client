@@ -19,12 +19,12 @@
 
             <VBox spacing="6.0">
                 <Label styleClass="field-label" text="Endereço IP do Servidor" />
-                <TextField fx:id="serverIpField" promptText="127.0.0.1" text="127.0.0.1" />
+                <TextField fx:id="serverIpField" onAction="#salvarAction" promptText="127.0.0.1" text="127.0.0.1" />
             </VBox>
 
             <VBox spacing="6.0">
                 <Label styleClass="field-label" text="Porta do Serviço" />
-                <TextField fx:id="serverPortField" promptText="34345" text="34345" />
+                <TextField fx:id="serverPortField" onAction="#salvarAction" promptText="34345" text="34345" />
             </VBox>
 
             <HBox alignment="CENTER_RIGHT" spacing="12.0">
@@ -32,7 +32,7 @@
                     <Insets top="8.0" />
                 </padding>
                 <Region HBox.hgrow="ALWAYS" />
-                <Button mnemonicParsing="false" onMouseClicked="#salvar" styleClass="primary-button" text="Salvar Alterações" />
+                <Button defaultButton="true" mnemonicParsing="false" onAction="#salvarAction" onMouseClicked="#salvar" styleClass="primary-button" text="Salvar Alterações" />
             </HBox>
         </VBox>
     </VBox>

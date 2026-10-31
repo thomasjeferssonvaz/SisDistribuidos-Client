@@ -1,267 +1,699 @@
 /* ==========================================================================
-   PALETA DE CORES & VARIÁVEIS BASE
+   PALETA DE CORES — TEMA ASFALTO & ÂMBAR AUTOMOTIVO
+   Fundo grafite neutro (#18181B), superfícies em concreto escuro (#232329)
+   e destaques em âmbar de sinalização viária (#F59E0B) e azul cobalto (#3B82F6)
    ========================================================================== */
 .root {
     -fx-font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
-    -fx-accent-color: #7287fd;
-    -fx-focus-color: #89b4fa;
+    -fx-accent-color: #f59e0b;
+    -fx-focus-color: #f59e0b;
+    -fx-faint-focus-color: transparent;
 }
 
-/* Fundo Principal */
+/* Fundo Principal (Asfalto Escuro Neutro) */
 .main-background {
-    -fx-background-color: #181825;
+    -fx-background-color: #18181b;
 }
 
 /* Barra Superior e Rodapé */
 .upperNav {
-    -fx-background-color: #1e1e2e;
-    -fx-border-color: transparent transparent #313244 transparent;
+    -fx-background-color: #202024;
+    -fx-border-color: transparent transparent #323238 transparent;
     -fx-border-width: 0 0 1 0;
 }
 
 .footer {
-    -fx-background-color: #1e1e2e;
-    -fx-border-color: #313244 transparent transparent transparent;
+    -fx-background-color: #202024;
+    -fx-border-color: #323238 transparent transparent transparent;
     -fx-border-width: 1 0 0 0;
 }
 
 .footer-text {
-    -fx-text-fill: #6c7086;
+    -fx-text-fill: #71717a;
     -fx-font-size: 12px;
     -fx-font-weight: 500;
 }
 
 /* ==========================================================================
-   TIPOGRAFIA
+   TIPOGRAFIA & INDICADORES
    ========================================================================== */
 .brand-title {
-    -fx-text-fill: #cdd6f4;
-    -fx-font-size: 18px;
+    -fx-text-fill: #fafafa;
+    -fx-font-size: 17px;
+    -fx-font-weight: 700;
+}
+
+.brand-subtitle-tag {
+    -fx-text-fill: #fbbf24;
+    -fx-background-color: rgba(245, 158, 11, 0.14);
+    -fx-border-color: rgba(245, 158, 11, 0.35);
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 3px 9px;
+    -fx-font-size: 11px;
     -fx-font-weight: 700;
 }
 
 .card-title {
-    -fx-text-fill: #cdd6f4;
-    -fx-font-size: 24px;
+    -fx-text-fill: #fafafa;
+    -fx-font-size: 20px;
     -fx-font-weight: 700;
 }
 
 .card-subtitle {
-    -fx-text-fill: #a6adc8;
-    -fx-font-size: 13px;
+    -fx-text-fill: #a1a1aa;
+    -fx-font-size: 12.5px;
 }
 
 .field-label {
-    -fx-text-fill: #bac2de;
-    -fx-font-size: 13px;
+    -fx-text-fill: #d4d4d8;
+    -fx-font-size: 12.5px;
     -fx-font-weight: 600;
 }
 
 .section-header-label {
-    -fx-text-fill: #89b4fa;
+    -fx-text-fill: #fafafa;
     -fx-font-size: 14px;
     -fx-font-weight: 700;
 }
 
 .feedback-label {
-    -fx-text-fill: #f38ba8;
+    -fx-text-fill: #f87171;
     -fx-font-size: 12px;
     -fx-font-weight: 500;
 }
 
+.status-output-label {
+    -fx-text-fill: #f4f4f5;
+    -fx-background-color: #18181b;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 14px;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 500;
+}
+
+.session-user-pill {
+    -fx-text-fill: #fafafa;
+    -fx-background-color: #18181b;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px 11px;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 700;
+}
+
+.role-badge {
+    -fx-text-fill: #fbbf24;
+    -fx-background-color: rgba(245, 158, 11, 0.15);
+    -fx-border-color: rgba(245, 158, 11, 0.45);
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 4px 10px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
 /* ==========================================================================
-   CARDS & CONTAINERS
+   PAINÉIS, CARDS & BARRA DE NAVEGAÇÃO
    ========================================================================== */
 .mainBox {
     -fx-background-color: transparent;
 }
 
+.workspace-toolbar {
+    -fx-background-color: #232329;
+    -fx-border-color: #34343c;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 8px 14px;
+}
+
 .auth-card {
-    -fx-background-color: #1e1e2e;
+    -fx-background-color: #232329;
     -fx-background-radius: 12px;
-    -fx-border-color: #313244;
+    -fx-border-color: #34343c;
     -fx-border-radius: 12px;
     -fx-border-width: 1px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 18, 0.1, 0, 6);
-    -fx-padding: 22px 28px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 16, 0.08, 0, 5);
+    -fx-padding: 24px 28px;
+}
+
+.surface-card {
+    -fx-background-color: #232329;
+    -fx-background-radius: 10px;
+    -fx-border-color: #34343c;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px 18px;
+}
+
+.surface-card-compact {
+    -fx-background-color: #232329;
+    -fx-background-radius: 10px;
+    -fx-border-color: #34343c;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 11px 16px;
 }
 
 .section-separator .line {
-    -fx-border-color: #313244;
+    -fx-border-color: #34343c;
     -fx-border-width: 0.5px;
 }
 
+.transparent-scroll, .transparent-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
 /* ==========================================================================
-   INPUTS (TextField & PasswordField)
+   MAPA VISUAL DE VAGAS (CARDS DE BAIAS POR ANDAR)
+   ========================================================================== */
+.floor-section-card {
+    -fx-background-color: #1e1e24;
+    -fx-border-color: #32323a;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 14px 16px;
+}
+
+.floor-badge {
+    -fx-background-color: #2c2c35;
+    -fx-border-color: #464652;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #fafafa;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 700;
+    -fx-padding: 4px 12px;
+}
+
+.spot-tile {
+    -fx-background-color: #25252c;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1.5px;
+    -fx-padding: 12px 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 8, 0.05, 0, 2);
+}
+
+.spot-tile:hover {
+    -fx-background-color: #2c2c35;
+}
+
+.spot-tile:focused {
+    -fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.45), 12, 0.25, 0, 0);
+}
+
+.spot-tile-available {
+    -fx-border-color: #22c55e;
+    -fx-background-color: rgba(34, 197, 94, 0.07);
+}
+
+.spot-tile-available:hover {
+    -fx-background-color: rgba(34, 197, 94, 0.14);
+}
+
+.spot-tile-own {
+    -fx-border-color: #f59e0b;
+    -fx-background-color: rgba(245, 158, 11, 0.10);
+}
+
+.spot-tile-own:hover {
+    -fx-background-color: rgba(245, 158, 11, 0.18);
+}
+
+.spot-tile-occupied {
+    -fx-border-color: #3b82f6;
+    -fx-background-color: rgba(59, 130, 246, 0.08);
+}
+
+.spot-tile-occupied:hover {
+    -fx-background-color: rgba(59, 130, 246, 0.15);
+}
+
+.spot-tile-out {
+    -fx-border-color: #52525b;
+    -fx-background-color: #1c1c21;
+    -fx-opacity: 0.82;
+}
+
+.spot-tile-out:hover {
+    -fx-background-color: #24242b;
+}
+
+.spot-tile-highlighted {
+    -fx-border-color: #fbbf24;
+    -fx-border-width: 2.5px;
+    -fx-effect: dropshadow(gaussian, rgba(251, 191, 36, 0.55), 16, 0.3, 0, 0);
+}
+
+.spot-code-label {
+    -fx-text-fill: #fafafa;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+}
+
+.spot-status-pill-available {
+    -fx-background-color: rgba(34, 197, 94, 0.2);
+    -fx-text-fill: #4ade80;
+    -fx-background-radius: 5px;
+    -fx-padding: 2px 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.spot-status-pill-own {
+    -fx-background-color: rgba(245, 158, 11, 0.22);
+    -fx-text-fill: #fbbf24;
+    -fx-background-radius: 5px;
+    -fx-padding: 2px 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.spot-status-pill-occupied {
+    -fx-background-color: rgba(59, 130, 246, 0.22);
+    -fx-text-fill: #60a5fa;
+    -fx-background-radius: 5px;
+    -fx-padding: 2px 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.spot-status-pill-out {
+    -fx-background-color: rgba(113, 113, 122, 0.25);
+    -fx-text-fill: #a1a1aa;
+    -fx-background-radius: 5px;
+    -fx-padding: 2px 8px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.type-pill-eletrico {
+    -fx-background-color: rgba(56, 189, 248, 0.15);
+    -fx-border-color: rgba(56, 189, 248, 0.35);
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-text-fill: #38bdf8;
+    -fx-padding: 2px 7px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.type-pill-combustao {
+    -fx-background-color: rgba(245, 158, 11, 0.14);
+    -fx-border-color: rgba(245, 158, 11, 0.32);
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-text-fill: #fbbf24;
+    -fx-padding: 2px 7px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.plate-badge {
+    -fx-background-color: #141417;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #fafafa;
+    -fx-font-family: "Consolas", monospace;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 700;
+    -fx-padding: 4px 10px;
+}
+
+/* ==========================================================================
+   GALERIA VISUAL DE VEÍCULOS (CARDS DE GARAGEM)
+   ========================================================================== */
+.vehicle-tile {
+    -fx-background-color: #25252c;
+    -fx-border-color: #383842;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 14px 16px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 10, 0.06, 0, 3);
+}
+
+.vehicle-tile:hover {
+    -fx-border-color: #f59e0b;
+    -fx-background-color: #2b2b34;
+}
+
+.vehicle-tile:focused {
+    -fx-border-color: #fbbf24;
+    -fx-effect: dropshadow(gaussian, rgba(245, 158, 11, 0.45), 12, 0.25, 0, 0);
+}
+
+.mercosul-plate-box {
+    -fx-background-color: #141417;
+    -fx-border-color: #3b82f6 #3f3f46 #3f3f46 #3f3f46;
+    -fx-border-width: 3px 1px 1px 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 5px 12px;
+}
+
+.mercosul-plate-text {
+    -fx-text-fill: #fafafa;
+    -fx-font-family: "Consolas", monospace;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.vehicle-brand-title {
+    -fx-text-fill: #fafafa;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+/* ==========================================================================
+   CAMPOS DE ENTRADA (TextField, PasswordField, ComboBox, CheckBox)
    ========================================================================== */
 .text-field, .password-field {
-    -fx-background-color: #181825;
+    -fx-background-color: #18181b;
     -fx-background-radius: 8px;
-    -fx-border-color: #45475a;
+    -fx-border-color: #3f3f46;
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
-    -fx-text-fill: #cdd6f4;
-    -fx-prompt-text-fill: #585b70;
-    -fx-padding: 9px 12px;
+    -fx-text-fill: #fafafa;
+    -fx-prompt-text-fill: #71717a;
+    -fx-padding: 8px 12px;
     -fx-font-size: 13px;
 }
 
 .text-field:focused, .password-field:focused {
-    -fx-border-color: #89b4fa;
-    -fx-background-color: #1e1e2e;
-    -fx-effect: dropshadow(gaussian, rgba(137, 180, 250, 0.25), 8, 0.2, 0, 0);
+    -fx-border-color: #f59e0b;
+    -fx-background-color: #1c1c20;
 }
 
-/* Campo Desativado / Somente Leitura (Username) */
-/* Classe customizada para campos somente leitura */
 .text-field.readonly-field, .text-field:readonly {
-    -fx-background-color: #11111b;
-    -fx-text-fill: #6c7086;
-    -fx-border-color: #313244;
-    -fx-cursor: text;
+    -fx-background-color: #141417;
+    -fx-text-fill: #a1a1aa;
+    -fx-border-color: #2e2e36;
+    -fx-cursor: default;
+}
+
+.combo-box-base {
+    -fx-background-color: #18181b;
+    -fx-background-radius: 8px;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 3px 8px;
+    -fx-font-size: 13px;
+}
+
+.combo-box-base:focused {
+    -fx-border-color: #f59e0b;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #fafafa;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #232329;
+    -fx-border-color: #3f3f46;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+
+.combo-box-popup .list-view .list-cell {
+    -fx-text-fill: #e4e4e7;
+    -fx-background-color: #232329;
+    -fx-padding: 7px 12px;
+}
+
+.combo-box-popup .list-view .list-cell:hover,
+.combo-box-popup .list-view .list-cell:filled:selected {
+    -fx-background-color: #f59e0b;
+    -fx-text-fill: #18181b;
+    -fx-font-weight: 600;
+}
+
+.check-box {
+    -fx-text-fill: #a1a1aa;
+    -fx-font-size: 12px;
+}
+
+.check-box .box {
+    -fx-background-color: #18181b;
+    -fx-border-color: #52525b;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: #f59e0b;
+}
+
+.check-box:focused .box {
+    -fx-border-color: #f59e0b;
 }
 
 /* ==========================================================================
-   BOTÕES
+   BOTÕES E ABAS
    ========================================================================== */
-/* Botão de Ação Primária (Entrar, Registrar, Salvar) */
-.primary-button {
-    -fx-background-color: #89b4fa;
-    -fx-text-fill: #11111b;
-    -fx-font-weight: 700;
-    -fx-font-size: 13px;
+.nav-tab-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-padding: 10px 18px;
+    -fx-text-fill: #a1a1aa;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-padding: 7px 16px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(137, 180, 250, 0.2), 6, 0.1, 0, 2);
 }
 
-.primary-button:hover {
-    -fx-background-color: #b4befe;
+.nav-tab-button:hover {
+    -fx-background-color: #2e2e36;
+    -fx-text-fill: #fafafa;
 }
 
-.primary-button:pressed {
-    -fx-background-color: #74c7ec;
+.nav-tab-active {
+    -fx-background-color: #f59e0b;
+    -fx-border-color: #f59e0b;
+    -fx-text-fill: #18181b;
+    -fx-font-weight: 700;
 }
 
-.primary-button:disabled {
-    -fx-background-color: #45475a;
-    -fx-text-fill: #6c7086;
-    -fx-opacity: 0.8;
+.nav-tab-active:hover {
+    -fx-background-color: #fbbf24;
+    -fx-text-fill: #18181b;
 }
 
-/* Botão Secundário (Alterar Senha, Ações Complementares) */
-.secondary-button {
-    -fx-background-color: rgba(203, 166, 247, 0.12);
-    -fx-border-color: #cba6f7;
+.nav-tab-button:focused {
+    -fx-border-color: #fbbf24;
+}
+
+/* Botões de Filtro de Vagas (ToggleButton) */
+.filter-toggle-button {
+    -fx-background-color: #1c1c21;
+    -fx-border-color: #3f3f46;
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-text-fill: #cba6f7;
+    -fx-text-fill: #a1a1aa;
+    -fx-font-weight: 600;
+    -fx-font-size: 12px;
+    -fx-padding: 6px 12px;
+    -fx-cursor: hand;
+}
+
+.filter-toggle-button:hover {
+    -fx-background-color: #27272e;
+    -fx-border-color: #71717a;
+    -fx-text-fill: #fafafa;
+}
+
+.filter-toggle-button:selected {
+    -fx-background-color: rgba(245, 158, 11, 0.18);
+    -fx-border-color: #f59e0b;
+    -fx-text-fill: #fbbf24;
+    -fx-font-weight: 700;
+}
+
+.filter-toggle-button:focused {
+    -fx-border-color: #fbbf24;
+}
+
+/* Botão Primário — Âmbar Automotivo */
+.primary-button {
+    -fx-background-color: #f59e0b;
+    -fx-border-color: transparent;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #18181b;
     -fx-font-weight: 700;
     -fx-font-size: 13px;
-    -fx-padding: 9px 18px;
+    -fx-padding: 8px 18px;
+    -fx-cursor: hand;
+}
+
+.primary-button:hover {
+    -fx-background-color: #fbbf24;
+}
+
+.primary-button:focused {
+    -fx-border-color: #fef3c7;
+}
+
+.primary-button:pressed {
+    -fx-background-color: #d97706;
+}
+
+.primary-button:disabled {
+    -fx-background-color: #323238;
+    -fx-text-fill: #71717a;
+    -fx-opacity: 0.75;
+}
+
+/* Botão Secundário — Grafite & Azul Cobalto */
+.secondary-button {
+    -fx-background-color: #2c2c34;
+    -fx-border-color: #464652;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #f4f4f5;
+    -fx-font-weight: 600;
+    -fx-font-size: 12.5px;
+    -fx-padding: 7px 15px;
     -fx-cursor: hand;
 }
 
 .secondary-button:hover {
-    -fx-background-color: #cba6f7;
-    -fx-text-fill: #11111b;
-    -fx-effect: dropshadow(gaussian, rgba(203, 166, 247, 0.25), 6, 0.1, 0, 2);
+    -fx-background-color: #3b82f6;
+    -fx-border-color: #3b82f6;
+    -fx-text-fill: #ffffff;
+}
+
+.secondary-button:focused {
+    -fx-border-color: #f59e0b;
 }
 
 .secondary-button:pressed {
-    -fx-background-color: #b4befe;
-    -fx-border-color: #b4befe;
-    -fx-text-fill: #11111b;
+    -fx-background-color: #2563eb;
+    -fx-border-color: #2563eb;
+    -fx-text-fill: #ffffff;
 }
 
 .secondary-button:disabled {
-    -fx-background-color: transparent;
-    -fx-border-color: #45475a;
-    -fx-text-fill: #6c7086;
+    -fx-background-color: #232329;
+    -fx-border-color: #323238;
+    -fx-text-fill: #71717a;
     -fx-opacity: 0.7;
 }
 
-/* Botão de Perigo/Destrutivo (Deslogar) */
+/* Botão Destrutivo */
 .danger-button {
-    -fx-background-color: rgba(243, 139, 168, 0.15);
-    -fx-border-color: #f38ba8;
+    -fx-background-color: rgba(239, 68, 68, 0.14);
+    -fx-border-color: rgba(239, 68, 68, 0.55);
     -fx-border-width: 1px;
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
-    -fx-text-fill: #f38ba8;
-    -fx-font-weight: 600;
-    -fx-padding: 8px 16px;
+    -fx-text-fill: #f87171;
+    -fx-font-weight: 700;
+    -fx-font-size: 12.5px;
+    -fx-padding: 7px 15px;
     -fx-cursor: hand;
 }
 
 .danger-button:hover {
-    -fx-background-color: #f38ba8;
-    -fx-text-fill: #11111b;
+    -fx-background-color: #ef4444;
+    -fx-border-color: #ef4444;
+    -fx-text-fill: #ffffff;
 }
 
-/* Botão Link de Troca de Modo */
+.danger-button:focused {
+    -fx-border-color: #fca5a5;
+}
+
+.danger-button:disabled {
+    -fx-background-color: #232329;
+    -fx-border-color: #323238;
+    -fx-text-fill: #71717a;
+    -fx-opacity: 0.7;
+}
+
 .switchModeButton {
     -fx-background-color: transparent;
-    -fx-text-fill: #89b4fa;
-    -fx-font-size: 12px;
+    -fx-text-fill: #fbbf24;
+    -fx-font-size: 12.5px;
     -fx-font-weight: 600;
     -fx-cursor: hand;
     -fx-padding: 4px;
-    -fx-underline: false;
 }
 
 .switchModeButton:hover {
     -fx-underline: true;
-    -fx-text-fill: #b4befe;
+    -fx-text-fill: #fde68a;
 }
 
-/* Botão SVG de Ícone (Engrenagem / Configurações) */
 .svgButton {
-    -fx-background-color: transparent;
+    -fx-background-color: #27272e;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
     -fx-cursor: hand;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px;
+    -fx-padding: 7px 9px;
 }
 
 .svgButton .svg-icon {
-    -fx-fill: #a6adc8;
+    -fx-fill: #d4d4d8;
 }
 
 .svgButton:hover {
-    -fx-background-color: rgba(205, 214, 244, 0.08);
+    -fx-background-color: #3f3f46;
+    -fx-border-color: #f59e0b;
+}
+
+.svgButton:focused {
+    -fx-border-color: #f59e0b;
 }
 
 .svgButton:hover .svg-icon {
-    -fx-fill: #cdd6f4;
+    -fx-fill: #fbbf24;
 }
 
 /* ==========================================================================
-   NOTIFICAÇÕES TOAST
+   MODAL DE EXCLUSÃO & TOASTS
    ========================================================================== */
-/* Confirmação de exclusão da conta */
 .delete-warning-box {
-    -fx-background-color: rgba(243, 139, 168, 0.10);
-    -fx-border-color: #f38ba8;
+    -fx-background-color: rgba(239, 68, 68, 0.10);
+    -fx-border-color: rgba(239, 68, 68, 0.45);
     -fx-border-radius: 8px;
     -fx-background-radius: 8px;
     -fx-padding: 14px;
 }
 
 .delete-warning-title {
-    -fx-text-fill: #f38ba8;
-    -fx-font-size: 14px;
+    -fx-text-fill: #f87171;
+    -fx-font-size: 13.5px;
     -fx-font-weight: bold;
 }
 
 .delete-account-username {
-    -fx-text-fill: #cdd6f4;
-    -fx-font-family: monospace;
-    -fx-font-size: 14px;
-    -fx-background-color: #181825;
-    -fx-background-radius: 6px;
-    -fx-padding: 10px 12px;
+    -fx-text-fill: #fafafa;
+    -fx-font-family: "Consolas", monospace;
+    -fx-font-size: 13.5px;
+    -fx-background-color: #18181b;
+    -fx-border-color: #3f3f46;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 9px 12px;
 }
 
 .toast-container {
@@ -271,23 +703,23 @@
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
     -fx-padding: 10px 20px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 15, 0.15, 0, 6);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 14, 0.15, 0, 5);
 }
 
 .toast-success {
-    -fx-background-color: #1e1e2e;
-    -fx-text-fill: #a6e3a1;
-    -fx-border-color: #a6e3a1;
+    -fx-background-color: #232329;
+    -fx-text-fill: #4ade80;
+    -fx-border-color: #22c55e;
 }
 
 .toast-error {
-    -fx-background-color: #1e1e2e;
-    -fx-text-fill: #f38ba8;
-    -fx-border-color: #f38ba8;
+    -fx-background-color: #232329;
+    -fx-text-fill: #f87171;
+    -fx-border-color: #ef4444;
 }
 
 .toast-info {
-    -fx-background-color: #1e1e2e;
-    -fx-text-fill: #89b4fa;
-    -fx-border-color: #89b4fa;
+    -fx-background-color: #232329;
+    -fx-text-fill: #fbbf24;
+    -fx-border-color: #f59e0b;
 }

@@ -16,9 +16,11 @@ public class ClientApplication extends Application {
         }
 
         String viewPath = isLoggedIn ? "views/MainPage.fxml" : "views/Login.fxml";
-        String title = isLoggedIn ? "Client" : "Login";
+        String title = isLoggedIn ? "UTFPR Estacionamento — Cliente" : "UTFPR Estacionamento — Login";
 
+        NavigationUtils.applyClientIcon(stage);
         NavigationUtils.navigateTo(stage, viewPath, title);
         stage.show();
+        NavigationUtils.applyClientIcon(stage);
     }
 }

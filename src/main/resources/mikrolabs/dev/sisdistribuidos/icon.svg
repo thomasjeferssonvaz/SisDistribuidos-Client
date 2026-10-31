@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Base Squircle Asfalto -->
+  <path d="M 68 16 H 188 C 216.7 16 240 39.3 240 68 V 188 C 240 216.7 216.7 240 188 240 H 68 C 39.3 240 16 216.7 16 188 V 68 C 16 39.3 39.3 16 68 16 Z"
+        fill="#18181B" stroke="#2E2E36" stroke-width="4"/>
+
+  <!-- Moldura Interna com Borda Âmbar Automotivo -->
+  <path d="M 70 26 H 186 C 210.3 26 230 45.7 230 70 V 186 C 230 210.3 210.3 230 186 230 H 70 C 45.7 230 26 210.3 26 186 V 70 C 26 45.7 45.7 26 70 26 Z"
+        fill="#202026" stroke="#F59E0B" stroke-width="6"/>
+
+  <!-- Guias de Baia de Estacionamento -->
+  <path d="M 48 76 V 52 H 72" fill="none" stroke="#38BDF8" stroke-width="5"/>
+  <path d="M 208 76 V 52 H 184" fill="none" stroke="#38BDF8" stroke-width="5"/>
+
+  <!-- Letra P Geométrica de Estacionamento -->
+  <path d="M 66 54 H 116 C 137 54 150 66 150 84 C 150 102 137 114 116 114 H 90 V 136 H 66 V 54 Z M 90 73 V 95 H 114 C 122 95 127 90.5 127 84 C 127 77.5 122 73 114 73 H 90 Z"
+        fill="#F59E0B"/>
+
+  <!-- Raio Elétrico (EV) -->
+  <path d="M 186 54 L 166 86 H 183 L 173 116 L 203 78 H 185 L 186 54 Z"
+        fill="#38BDF8"/>
+
+  <!-- Silhueta Frontal de Veículo Moderno -->
+  <path d="M 56 176 L 68 144 C 72 134 80 130 92 130 H 164 C 176 130 184 134 188 144 L 200 176 C 206 178 210 184 210 192 V 204 H 192 V 214 H 172 V 204 H 84 V 214 H 64 V 204 H 46 V 192 C 46 184 50 178 56 176 Z"
+        fill="#FAFAFA"/>
+
+  <!-- Para-brisa -->
+  <path d="M 78 168 L 86 144 H 170 L 178 168 H 78 Z"
+        fill="#202026"/>
+
+  <!-- Faróis Âmbar -->
+  <path d="M 58 181 H 82 V 191 H 58 V 181 Z M 174 181 H 198 V 191 H 174 V 181 Z"
+        fill="#F59E0B"/>
+
+  <!-- Grade Frontal Azul -->
+  <path d="M 96 183 H 160 V 189 H 96 V 183 Z"
+        fill="#3B82F6"/>
+</svg>
+

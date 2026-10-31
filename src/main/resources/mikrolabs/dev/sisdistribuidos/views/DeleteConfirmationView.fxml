@@ -42,7 +42,7 @@
             <VBox spacing="8.0">
                 <Label styleClass="field-label" text="Para confirmar, digite o nome de usuário acima."
                        wrapText="true" labelFor="$confirmationUsernameField" />
-                <TextField fx:id="confirmationUsernameField" promptText="Digite seu nome de usuário"
+                <TextField fx:id="confirmationUsernameField" onAction="#deleteAccount" promptText="Digite seu nome de usuário"
                            accessibleText="Nome de usuário para confirmar a exclusão" />
                 <Label fx:id="confirmationFeedbackLabel" styleClass="feedback-label"
                        text="O nome deve corresponder exatamente ao usuário da conta."
@@ -55,7 +55,7 @@
             <HBox alignment="CENTER_RIGHT" spacing="12.0">
                 <Button fx:id="cancelButton" onAction="#cancelar" text="Cancelar" cancelButton="true"
                         mnemonicParsing="false" styleClass="secondary-button" />
-                <Button fx:id="confirmDeleteButton" text="Excluir minha conta" disable="true"
+                <Button fx:id="confirmDeleteButton" defaultButton="true" text="Excluir minha conta" disable="true"
                         mnemonicParsing="false" onAction="#deleteAccount" styleClass="danger-button" />
             </HBox>
         </VBox>

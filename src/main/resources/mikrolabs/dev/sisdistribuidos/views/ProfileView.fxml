@@ -20,7 +20,7 @@
             <!-- Campo Nome (Editável) -->
             <VBox spacing="6.0">
                 <Label styleClass="field-label" text="Nome" />
-                <TextField fx:id="nameField" promptText="Seu nome completo" />
+                <TextField fx:id="nameField" onAction="#salvarPerfil" promptText="Seu nome completo" />
             </VBox>
 
             <!-- Campo Username (Bloqueado/Não alterável) -->
@@ -42,17 +42,17 @@
 
                 <VBox spacing="6.0">
                     <Label styleClass="field-label" text="Senha Atual" />
-                    <PasswordField fx:id="currentPasswordField" promptText="********" />
+                    <PasswordField fx:id="currentPasswordField" onAction="#alterarSenha" promptText="********" />
                 </VBox>
 
                 <VBox spacing="6.0">
                     <Label styleClass="field-label" text="Nova Senha" />
-                    <PasswordField fx:id="newPasswordField" promptText="********" />
+                    <PasswordField fx:id="newPasswordField" onAction="#alterarSenha" promptText="********" />
                 </VBox>
 
                 <VBox spacing="6.0">
                     <Label styleClass="field-label" text="Repita a Nova Senha" />
-                    <PasswordField fx:id="confirmNewPasswordField" promptText="********" />
+                    <PasswordField fx:id="confirmNewPasswordField" onAction="#alterarSenha" promptText="********" />
                 </VBox>
 
                 <HBox alignment="CENTER_RIGHT">

@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
@@ -15,9 +16,14 @@ import java.util.ResourceBundle;
 public class BaseController implements Initializable {
     public Button configBtn;
     public Button profileBtn;
+    @FXML
+    public ImageView headerLogoImage;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        if (headerLogoImage != null) {
+            headerLogoImage.setImage(NavigationUtils.getClientHeaderIcon(68));
+        }
         if (profileBtn != null) {
             boolean isLoggedIn = ConfigManager.hasSession();
 
@@ -25,7 +31,6 @@ public class BaseController implements Initializable {
             profileBtn.setManaged(isLoggedIn);
         }
     }
-
 
     @FXML
     private void abrirConfiguracoes(ActionEvent event) {

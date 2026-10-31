@@ -1,23 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="600.0" prefWidth="900.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.MainPageController">
+<AnchorPane prefHeight="680.0" prefWidth="1080.0" styleClass="main-background"
+            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mikrolabs.dev.sisdistribuidos.controllers.MainPageController">
 
-    <!-- Navbar Superior -->
+    <!-- Barra Superior -->
     <fx:include fx:id="navbar"
                 source="components/Navbar.fxml"
                 AnchorPane.topAnchor="0.0"
                 AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" />
 
-    <!-- Área de Conteúdo Principal -->
-    <VBox alignment="CENTER" spacing="10.0" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0">
+    <!-- Conteúdo Principal -->
+    <VBox spacing="12.0" AnchorPane.bottomAnchor="44.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="56.0">
         <padding>
-            <Insets bottom="20.0" left="24.0" right="24.0" top="20.0" />
+            <Insets bottom="14.0" left="20.0" right="20.0" top="14.0" />
         </padding>
-        <!-- Inserir aqui tabelas, listas ou outros controles do sistema distribuído -->
+
+        <!-- Barra de Contexto e Abas de Navegação -->
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="workspace-toolbar">
+            <HBox alignment="CENTER_LEFT" spacing="8.0">
+                <Button fx:id="tabVagasBtn" mnemonicParsing="true" onAction="#showVagasTab"
+                        styleClass="nav-tab-button" text="_Mapa de Vagas" />
+                <Button fx:id="tabVehiclesBtn" mnemonicParsing="true" onAction="#showVehiclesTab"
+                        styleClass="nav-tab-button" text="_Veículos" />
+                <Button fx:id="tabUsersAdminBtn" mnemonicParsing="true" onAction="#showUsersAdminTab"
+                        styleClass="nav-tab-button" text="_Gestão de Usuários" />
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS" />
+
+            <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                <Label styleClass="field-label" text="Conectado como:" />
+                <Label fx:id="sessionUserLabel" styleClass="session-user-pill" text="—" />
+                <Label fx:id="sessionRoleBadge" styleClass="role-badge" text="—" />
+                <Button fx:id="syncRoleBtn" mnemonicParsing="false" onAction="#sincronizarPerfil"
+                        styleClass="secondary-button" text="Atualizar Sessão" />
+            </HBox>
+        </HBox>
+
+        <!-- ==================== PAINEL 1: MAPA VISUAL DE VAGAS ==================== -->
+        <VBox fx:id="vagasPane" spacing="12.0" VBox.vgrow="ALWAYS">
+
+            <!-- Barra de Localização por Placa -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="surface-card-compact">
+                <Label styleClass="section-header-label" text="Localizar Veículo no Pátio" />
+                <TextField fx:id="findVehiclePlateField" onAction="#localizarVeiculo" prefWidth="180.0"
+                           promptText="Placa (ex.: ABC1234)" />
+                <Button fx:id="findVehicleBtn" mnemonicParsing="false" onAction="#localizarVeiculo"
+                        styleClass="primary-button" text="Buscar Vaga" />
+                <Separator orientation="VERTICAL" />
+                <Label fx:id="findVehicleResultLabel" styleClass="status-output-label"
+                       text="Informe a placa para localizar o andar e destacar a vaga no mapa."
+                       wrapText="true" HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <!-- Mapa Visual do Pátio (Cards por Andar, sem tabelas) -->
+            <VBox spacing="12.0" styleClass="surface-card" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                    <VBox spacing="2.0">
+                        <Label styleClass="section-header-label" text="Pátio de Vagas (clique em uma vaga para ajustar)" />
+                        <Label fx:id="vagasFilterSubtitleLabel" styleClass="card-subtitle"
+                               text="Exibindo todas as vagas do estacionamento (incluindo fora de serviço e terceiros)" />
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <ToggleButton fx:id="toggleAllExceptOthersBtn" mnemonicParsing="false" selected="true"
+                                  onAction="#alternarFiltroSemTerceiros" styleClass="filter-toggle-button"
+                                  text="Vagas fora de serviço" />
+                    <ToggleButton fx:id="toggleOtherUsersSpotsBtn" mnemonicParsing="false" selected="true"
+                                  onAction="#alternarFiltroOcupadasOutros" styleClass="filter-toggle-button"
+                                  text="Ocupadas por outros" />
+                    <Button fx:id="refreshVagasBtn" mnemonicParsing="false" onAction="#carregarVagas"
+                            styleClass="secondary-button" text="Atualizar Vagas" />
+                    <Button fx:id="openCreateVagaModalBtn" mnemonicParsing="false" onAction="#abrirModalCriarVaga"
+                            styleClass="primary-button" text="+ Nova Vaga" />
+                </HBox>
+
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="vagasVisualContainer" spacing="14.0">
+                            <padding>
+                                <Insets bottom="6.0" right="4.0" top="4.0" />
+                            </padding>
+                        </VBox>
+                    </content>
+                </ScrollPane>
+            </VBox>
+        </VBox>
+
+        <!-- ==================== PAINEL 2: GALERIA VISUAL DE VEÍCULOS ==================== -->
+        <VBox fx:id="vehiclesPane" managed="false" spacing="12.0" visible="false" VBox.vgrow="ALWAYS">
+
+            <!-- Barra de Consulta por Placa e Ações -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="surface-card-compact">
+                <Label styleClass="section-header-label" text="Consultar Veículo por Placa" />
+                <TextField fx:id="searchVehiclePlateField" onAction="#consultarVeiculoPorPlaca" prefWidth="200.0"
+                           promptText="Digite a placa (ex.: ABC1234)" />
+                <Button fx:id="searchVehicleBtn" mnemonicParsing="false" onAction="#consultarVeiculoPorPlaca"
+                        styleClass="secondary-button" text="Abrir Ficha da Placa" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="refreshVehiclesBtn" mnemonicParsing="false" onAction="#carregarMeusVeiculos"
+                        styleClass="secondary-button" text="Recarregar Veículos" />
+                <Button fx:id="openCreateVehicleModalBtn" mnemonicParsing="false" onAction="#abrirModalCriarVeiculo"
+                        styleClass="primary-button" text="+ Cadastrar Veículo" />
+            </HBox>
+
+            <!-- Galeria de Cards de Veículos -->
+            <VBox spacing="12.0" styleClass="surface-card" VBox.vgrow="ALWAYS">
+                <VBox spacing="2.0">
+                    <Label fx:id="vehiclesGalleryTitleLabel" styleClass="section-header-label"
+                           text="Garagem de Veículos (clique em um veículo para editar ou excluir)" />
+                    <Label fx:id="vehiclesGallerySubtitleLabel" styleClass="card-subtitle"
+                           text="Seus veículos cadastrados aparecem abaixo em formato de cartões." />
+                </VBox>
+
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <FlowPane fx:id="vehiclesVisualPane" hgap="14.0" vgap="14.0">
+                            <padding>
+                                <Insets bottom="8.0" right="4.0" top="4.0" />
+                            </padding>
+                        </FlowPane>
+                    </content>
+                </ScrollPane>
+            </VBox>
+        </VBox>
+
+        <!-- ==================== PAINEL 3: GESTÃO DE USUÁRIOS (ADMIN) ==================== -->
+        <VBox fx:id="usersAdminPane" managed="false" spacing="12.0" visible="false" VBox.vgrow="ALWAYS">
+
+            <!-- Barra de Pesquisa de Usuário e Botão de Novo Cadastro -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="surface-card-compact">
+                <Label styleClass="section-header-label" text="Pesquisar Conta por Username" />
+                <TextField fx:id="targetSearchUsernameField" onAction="#buscarUsuarioAlvo" prefWidth="240.0"
+                           promptText="Digite o username (ex.: joao.silva)" />
+                <Button fx:id="searchTargetUserBtn" mnemonicParsing="false" onAction="#buscarUsuarioAlvo"
+                        styleClass="secondary-button" text="Pesquisar Usuário" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="openCreateUserModalBtn" mnemonicParsing="false" onAction="#abrirModalCriarUsuarioAdmin"
+                        styleClass="primary-button" text="+ Novo Usuário / Admin" />
+            </HBox>
+
+            <!-- Área Visual do Usuário Consultado -->
+            <VBox alignment="TOP_CENTER" spacing="14.0" styleClass="surface-card" VBox.vgrow="ALWAYS">
+                <VBox fx:id="userAdminResultContainer" alignment="CENTER" spacing="14.0" VBox.vgrow="ALWAYS" />
+            </VBox>
+        </VBox>
     </VBox>
 
     <!-- Rodapé -->

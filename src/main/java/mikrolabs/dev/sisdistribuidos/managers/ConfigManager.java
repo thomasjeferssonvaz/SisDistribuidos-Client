@@ -35,21 +35,16 @@ public class ConfigManager {
     }
 
     public static synchronized void save(String ip, String port) {
+        String previousIp = properties.getProperty("ServerIp");
+        String previousPort = properties.getProperty("ServerPort");
         properties.setProperty("ServerIp", ip);
         properties.setProperty("ServerPort", port);
+        if ((previousIp != null && !previousIp.equals(ip))
+                || (previousPort != null && !previousPort.equals(port))) {
+            properties.remove("Role");
+        }
         persist();
     }
-
-//    public static synchronized void saveToken(String token) {
-//        if (token == null || token.isBlank()) {
-//            properties.remove("Token");
-//            System.out.println("Token removido com sucesso!");
-//        } else {
-//            properties.setProperty("Token", token);
-//            System.out.println("Token salvo com sucesso!");
-//        }
-//        persist();
-//    }
 
     public static synchronized void saveVariable(String fieldName, String value) {
         if (value == null || value.isBlank()) {
@@ -72,9 +67,36 @@ public class ConfigManager {
         persist();
     }
 
-
     public static synchronized String getToken() {
         return properties.getProperty("Token", null);
+    }
+
+    public static synchronized String getRole() {
+        String role = properties.getProperty("Role", null);
+        if (role == null) return null;
+        String normalized = role.trim();
+        return ("admin".equals(normalized) || "user".equals(normalized)) ? normalized : null;
+    }
+
+    public static synchronized void saveRole(String role) {
+        if (role != null && ("admin".equals(role.trim()) || "user".equals(role.trim()))) {
+            saveVariable("Role", role.trim());
+        } else {
+            clearRole();
+        }
+    }
+
+    public static synchronized void clearRole() {
+        properties.remove("Role");
+        persist();
+    }
+
+    public static synchronized boolean isAdmin() {
+        return "admin".equals(getRole());
+    }
+
+    public static synchronized boolean isUser() {
+        return "user".equals(getRole());
     }
 
     public static synchronized boolean hasSession() {
@@ -89,6 +111,7 @@ public class ConfigManager {
     public static synchronized void clearSession() {
         properties.remove("Token");
         properties.remove("Username");
+        properties.remove("Role");
         persist();
     }
 

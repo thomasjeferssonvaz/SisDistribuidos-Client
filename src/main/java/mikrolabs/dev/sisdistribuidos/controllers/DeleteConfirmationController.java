@@ -1,7 +1,5 @@
 package mikrolabs.dev.sisdistribuidos.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,8 +8,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import mikrolabs.dev.sisdistribuidos.DTOs.Request;
 import mikrolabs.dev.sisdistribuidos.DTOs.Response;
+import mikrolabs.dev.sisdistribuidos.DTOs.User;
 import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
@@ -20,9 +18,9 @@ import mikrolabs.dev.sisdistribuidos.utils.SessionUtils;
 import mikrolabs.dev.sisdistribuidos.utils.Toast;
 
 import java.net.URL;
-import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class DeleteConfirmationController implements Initializable {
     public Label accountUsernameLabel;
@@ -32,25 +30,25 @@ public class DeleteConfirmationController implements Initializable {
     public Button confirmDeleteButton;
 
     private boolean exclusaoEmAndamento = false;
-
-
-    private final Gson gson = new Gson();
+    private String customTargetUsername = null;
+    private Consumer<Response> onCustomTargetDeleted = null;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        String username = ConfigManager.getUsername();
+        String target = resolveTargetUsername();
 
-        accountUsernameLabel.setText(username);
+        accountUsernameLabel.setText(target);
         confirmationFeedbackLabel.setVisible(false);
         confirmationFeedbackLabel.setManaged(false);
         confirmDeleteButton.setDisable(true);
 
         confirmationUsernameField.textProperty().addListener(
                 (observable, oldValue, newValue) -> {
+                    String currentTarget = resolveTargetUsername();
                     boolean matches = ConfigManager.hasSession()
-                            && username != null
-                            && !username.isBlank()
-                            && username.equals(newValue);
+                            && currentTarget != null
+                            && !currentTarget.isBlank()
+                            && currentTarget.equals(newValue);
 
                     confirmDeleteButton.setDisable(exclusaoEmAndamento || !matches);
 
@@ -69,6 +67,17 @@ public class DeleteConfirmationController implements Initializable {
         });
     }
 
+    public void configureTargetUser(String targetUsername, Consumer<Response> onDeletedCallback) {
+        this.customTargetUsername = targetUsername;
+        this.onCustomTargetDeleted = onDeletedCallback;
+        accountUsernameLabel.setText(targetUsername);
+        confirmationUsernameField.clear();
+        confirmDeleteButton.setDisable(true);
+    }
+
+    private String resolveTargetUsername() {
+        return customTargetUsername != null ? customTargetUsername : ConfigManager.getUsername();
+    }
 
     @FXML
     private void deleteAccount(ActionEvent mouseEvent) {
@@ -79,16 +88,21 @@ public class DeleteConfirmationController implements Initializable {
         }
 
         String token = ConfigManager.getToken();
-        String username = ConfigManager.getUsername();
-        if (!SessionUtils.ensureSession(toast, token, username)) {
+        String sessionUsername = ConfigManager.getUsername();
+        if (!SessionUtils.ensureSession(toast, token, sessionUsername)) {
             return;
         }
 
-        if (confirmationUsernameField.getText().isEmpty() || !Objects.equals(confirmationUsernameField.getText(), username)) {
+        String targetUsername = resolveTargetUsername();
+        if (confirmationUsernameField.getText().isEmpty()
+                || !Objects.equals(confirmationUsernameField.getText(), targetUsername)) {
             confirmationFeedbackLabel.setVisible(true);
             confirmationFeedbackLabel.setManaged(true);
             return;
         }
+
+        boolean deletingAnotherAccount = customTargetUsername != null
+                && !Objects.equals(customTargetUsername, sessionUsername);
 
         exclusaoEmAndamento = true;
         confirmDeleteButton.setDisable(true);
@@ -96,12 +110,7 @@ public class DeleteConfirmationController implements Initializable {
 
         new Thread(() -> {
             try {
-
-                JsonElement data = gson.toJsonTree(Map.of(
-                        "token", token,
-                        "username", username
-                ));
-                Response deleteUser = SocketManager.sendRequest(new Request("deleteuser", data));
+                Response deleteUser = SocketManager.sendRequest(User.deleteUserRequest(token, targetUsername));
 
                 if (deleteUser == null) {
                     throw new ServerConnectionError();
@@ -118,8 +127,15 @@ public class DeleteConfirmationController implements Initializable {
                     boolean isSuccess = deleteUser.statusCode() == 200;
 
                     if (isSuccess) {
-                        ConfigManager.clearSession();
-                        NavigationUtils.returnToLogin(toast, deleteUser);
+                        if (deletingAnotherAccount) {
+                            toast.close();
+                            if (onCustomTargetDeleted != null) {
+                                onCustomTargetDeleted.accept(deleteUser);
+                            }
+                        } else {
+                            ConfigManager.clearSession();
+                            NavigationUtils.returnToLogin(toast, deleteUser);
+                        }
                     } else {
                         Toast.show(toast, deleteUser.message(), Toast.Type.ERROR);
                         finalizarRequisicao();
@@ -150,11 +166,11 @@ public class DeleteConfirmationController implements Initializable {
         exclusaoEmAndamento = false;
         cancelButton.setDisable(false);
 
-        String username = ConfigManager.getUsername();
+        String targetUsername = resolveTargetUsername();
         boolean matches = ConfigManager.hasSession()
-                && username != null
-                && !username.isBlank()
-                && username.equals(confirmationUsernameField.getText());
+                && targetUsername != null
+                && !targetUsername.isBlank()
+                && targetUsername.equals(confirmationUsernameField.getText());
 
         confirmDeleteButton.setDisable(!matches);
     }
@@ -165,13 +181,7 @@ public class DeleteConfirmationController implements Initializable {
             return;
         }
 
-        Stage confirmationStage =
-                (Stage) cancelButton.getScene().getWindow();
-
+        Stage confirmationStage = (Stage) cancelButton.getScene().getWindow();
         confirmationStage.close();
     }
-
-
-
-
 }

@@ -1,7 +1,5 @@
 package mikrolabs.dev.sisdistribuidos.controllers;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -10,23 +8,25 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import mikrolabs.dev.sisdistribuidos.DTOs.Request;
 import mikrolabs.dev.sisdistribuidos.DTOs.Response;
+import mikrolabs.dev.sisdistribuidos.DTOs.User;
 import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
 import mikrolabs.dev.sisdistribuidos.managers.ConfigManager;
 import mikrolabs.dev.sisdistribuidos.managers.SocketManager;
-import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
-import mikrolabs.dev.sisdistribuidos.utils.Toast;
 import mikrolabs.dev.sisdistribuidos.utils.FieldValidation;
 import mikrolabs.dev.sisdistribuidos.utils.LoginResponseValidation;
+import mikrolabs.dev.sisdistribuidos.utils.NavigationUtils;
+import mikrolabs.dev.sisdistribuidos.utils.ProfileResponseValidation;
+import mikrolabs.dev.sisdistribuidos.utils.Toast;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class LoginController extends BaseController implements Initializable {
@@ -45,27 +45,37 @@ public class LoginController extends BaseController implements Initializable {
     public Button switchModeRegisterButton;
     public Button switchModeLoginButton;
     public TextField nameRegisterTextBox;
+    @FXML
+    public ImageView welcomeLogoImage;
+    @FXML
+    public ImageView registerLogoImage;
     boolean isRegister;
-    Gson gson = new Gson();
     @FXML
     private Node navbar;
     @FXML
     private Node footer;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        super.initialize(location, resources);
+        Image heroIcon = NavigationUtils.getClientHeaderIcon(136);
+        if (welcomeLogoImage != null && heroIcon != null) {
+            welcomeLogoImage.setImage(heroIcon);
+        }
+        if (registerLogoImage != null && heroIcon != null) {
+            registerLogoImage.setImage(heroIcon);
+        }
         Platform.runLater(() -> {
-            if (loginBox.getScene() != null) {
-                loginBox.getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            Node rootNode = loginBox != null && loginBox.getScene() != null ? loginBox.getScene().getRoot() : loginBox;
+            if (rootNode != null) {
+                rootNode.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                     if (event.getCode() == KeyCode.ENTER) {
-                        // Verifica qual card está visível no momento
                         if (loginBox.isVisible()) {
                             logar();
                         } else if (registerBox.isVisible()) {
                             registrar();
                         }
-                        event.consume(); // Previne comportamentos indesejados
+                        event.consume();
                     }
                 });
             }
@@ -73,16 +83,15 @@ public class LoginController extends BaseController implements Initializable {
         isRegister = false;
         registerBox.setVisible(false);
         registerBox.setManaged(false);
-
     }
 
     public void logar() {
         if (enviarBtn.isDisabled()) return;
-        String username =  usernameTextBox.getText();
+        String username = usernameTextBox.getText();
         String password = passwordTextBox.getText();
         Stage toast = (Stage) enviarBtn.getScene().getWindow();
 
-        if(username.isEmpty()) {
+        if (username.isEmpty()) {
             Toast.show(toast, "Informe o nome de usuário!", Toast.Type.INFO);
             return;
         }
@@ -92,15 +101,37 @@ public class LoginController extends BaseController implements Initializable {
 
         new Thread(() -> {
             try {
-                JsonElement data = gson.toJsonTree(Map.of(
-                        "username", username,
-                        "password", password
-                ));
-
-                Response loginResponse = SocketManager.sendRequest(new Request("login", data));
+                Response loginResponse = SocketManager.sendRequest(User.loginRequest(username, password));
                 if (loginResponse == null) {
                     throw new ServerConnectionError();
                 }
+
+                String extractedToken = null;
+                String fetchedRole = null;
+                IllegalArgumentException tokenError = null;
+
+                if (loginResponse.statusCode() == 200) {
+                    try {
+                        extractedToken = LoginResponseValidation.extractToken(loginResponse);
+                        try {
+                            Response getUserResponse = SocketManager.sendRequest(User.getUserRequest(extractedToken, username));
+                            if (getUserResponse != null && getUserResponse.statusCode() == 200) {
+                                var profile = ProfileResponseValidation.readData(getUserResponse.data());
+                                if (profile != null && profile.role() != null) {
+                                    fetchedRole = profile.role();
+                                }
+                            }
+                        } catch (Exception ignored) {
+                            // Role can also be fetched later in MainPage/Profile
+                        }
+                    } catch (IllegalArgumentException e) {
+                        tokenError = e;
+                    }
+                }
+
+                final String finalToken = extractedToken;
+                final String finalRole = fetchedRole;
+                final IllegalArgumentException finalTokenError = tokenError;
 
                 Platform.runLater(() -> {
                     try {
@@ -108,9 +139,12 @@ public class LoginController extends BaseController implements Initializable {
                             Toast.show(toast, loginResponse.message(), Toast.Type.ERROR);
                             return;
                         }
-                        String token = LoginResponseValidation.extractToken(loginResponse);
-                        ConfigManager.saveVariable("Token", token);
+                        if (finalTokenError != null) {
+                            throw finalTokenError;
+                        }
+                        ConfigManager.saveVariable("Token", finalToken);
                         ConfigManager.saveVariable("Username", username);
+                        ConfigManager.saveRole(finalRole);
                         mudarTela();
                         Toast.show(toast, loginResponse.message(), Toast.Type.SUCCESS);
                     } catch (IllegalArgumentException e) {
@@ -134,13 +168,11 @@ public class LoginController extends BaseController implements Initializable {
                 });
             }
         }).start();
-
     }
 
     public void switchMode() {
         isRegister = !isRegister;
         atualizarVisibilidade();
-
     }
 
     private void atualizarVisibilidade() {
@@ -162,11 +194,11 @@ public class LoginController extends BaseController implements Initializable {
     public void registrar() {
         if (enviarRegisterBtn.isDisabled()) return;
         String name = nameRegisterTextBox.getText();
-        String username =  usernameRegisterTextBox.getText();
+        String username = usernameRegisterTextBox.getText();
         String password = passwordRegisterTextBox.getText();
         Stage toast = (Stage) enviarRegisterBtn.getScene().getWindow();
 
-        if(username.isEmpty() || password.isEmpty() || name.isEmpty()) {
+        if (username.isEmpty() || password.isEmpty() || name.isEmpty()) {
             Toast.show(toast, "Preencha todos os campos!", Toast.Type.INFO);
             return;
         }
@@ -179,17 +211,11 @@ public class LoginController extends BaseController implements Initializable {
 
         new Thread(() -> {
             try {
-                JsonElement data = gson.toJsonTree(Map.of(
-                        "name", name,
-                        "username", username,
-                        "password", password
-                ));
-                Response registerResponse = SocketManager.sendRequest(new Request("register", data));
+                Response registerResponse = SocketManager.sendRequest(User.registerRequest(name, username, password));
                 System.out.println("Received: " + registerResponse);
                 if (registerResponse == null) {
                     throw new ServerConnectionError();
                 }
-
 
                 Platform.runLater(() -> {
                     enviarRegisterBtn.setDisable(false);
@@ -221,7 +247,6 @@ public class LoginController extends BaseController implements Initializable {
             }
         }).start();
     }
-
 
     private boolean validUsername(Stage stage, String username) {
         if (!FieldValidation.validUsername(username)) {

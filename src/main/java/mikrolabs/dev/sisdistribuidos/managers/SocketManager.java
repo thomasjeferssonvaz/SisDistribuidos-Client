@@ -1,35 +1,32 @@
 package mikrolabs.dev.sisdistribuidos.managers;
 
-
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonElement;
-import java.math.BigDecimal;
-import mikrolabs.dev.sisdistribuidos.DTOs.Request;
-import mikrolabs.dev.sisdistribuidos.DTOs.Response;
-import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
+import mikrolabs.dev.sisdistribuidos.DTOs.Request;
+import mikrolabs.dev.sisdistribuidos.DTOs.Response;
+import mikrolabs.dev.sisdistribuidos.exceptions.ServerConnectionError;
 
 public class SocketManager {
-    private static final Gson gson = new Gson();
-    public static Response sendRequest(Request request) throws ServerConnectionError {
+    private static final Gson gson = new GsonBuilder().serializeNulls().create();
 
-        String ip = ConfigManager.getServerIp() !=null ? ConfigManager.getServerIp() : "127.0.0.1";
+    public static Response sendRequest(Request request) throws ServerConnectionError {
+        String ip = ConfigManager.getServerIp() != null ? ConfigManager.getServerIp() : "127.0.0.1";
         int port = ConfigManager.getServerPort() != 0 ? ConfigManager.getServerPort() : 34345;
 
-
         try (Socket socket = new Socket()) {
-
             socket.connect(new InetSocketAddress(ip, port), 3000);
             socket.setSoTimeout(5000);
 
@@ -43,15 +40,14 @@ public class SocketManager {
             System.out.println("Sent:     " + jsonToSend);
             if (out.checkError()) throw new IOException("Falha ao enviar a requisição.");
 
-
             String jsonReceived = in.readLine();
             if (jsonReceived == null || jsonReceived.isBlank()) {
                 throw new ServerConnectionError("O servidor encerrou a conexão sem uma resposta válida.", null);
             }
+            System.out.println("Received: " + jsonReceived);
             Response response = parseResponse(jsonReceived);
 
-            System.out.println("Received: " + jsonReceived);
-            System.out.println("Parsed:   [Status: " + response.statusCode() + ", Result: " + response.message() + ", Data: "+ response.data() + "\n");
+            System.out.println("Parsed:   [Status: " + response.statusCode() + ", Result: " + response.message() + ", Data: " + response.data() + "\n");
 
             return response;
         } catch (SocketTimeoutException e) {
