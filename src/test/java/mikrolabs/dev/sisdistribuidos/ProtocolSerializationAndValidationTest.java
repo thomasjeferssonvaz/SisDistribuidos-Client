@@ -145,6 +145,22 @@ class ProtocolSerializationAndValidationTest {
         assertTrue(FieldValidation.validType("combustao"));
         assertFalse(FieldValidation.validType("diesel"));
 
+        assertTrue(FieldValidation.validSpotName("A1"));
+        assertTrue(FieldValidation.validSpotName("A100"));
+        assertFalse(FieldValidation.validSpotName("A1000"));
+        assertFalse(FieldValidation.validSpotName(""));
+
+        assertTrue(FieldValidation.validLicensePlate("ABC1D23"));
+        assertFalse(FieldValidation.validLicensePlate("ABC123"));
+        assertFalse(FieldValidation.validLicensePlate("ABC12345"));
+
+        assertTrue(FieldValidation.validBrand("Chevrolet"));
+        assertFalse(FieldValidation.validBrand("B".repeat(21)));
+
+        assertTrue(FieldValidation.validModel(null));
+        assertTrue(FieldValidation.validModel("Onix"));
+        assertFalse(FieldValidation.validModel("M".repeat(21)));
+
         assertTrue(FieldValidation.validPort("34345"));
         assertFalse(FieldValidation.validPort("0"));
         assertFalse(FieldValidation.validPort("70000"));
@@ -178,7 +194,7 @@ class ProtocolSerializationAndValidationTest {
         ).getAsJsonArray();
         List<Vaga> vagas = VagaResponseValidation.readVagas(vagasJson);
         assertEquals(2, vagas.size());
-        assertNull(vagas.get(0).licensePlate());
+        assertNull(vagas.getFirst().licensePlate());
         assertEquals("ABC1D23", vagas.get(1).licensePlate());
 
         // Rejects non-integer floor or invalid status
@@ -200,8 +216,8 @@ class ProtocolSerializationAndValidationTest {
         ).getAsJsonArray();
         List<Vehicle> vehicles = VehicleResponseValidation.readVehicles(vehiclesJson);
         assertEquals(1, vehicles.size());
-        assertNull(vehicles.get(0).model());
-        assertEquals("BYD1E11", vehicles.get(0).licensePlate());
+        assertNull(vehicles.getFirst().model());
+        assertEquals("BYD1E11", vehicles.getFirst().licensePlate());
 
         JsonElement invalidVehicle = JsonParser.parseString(
                 "{\"brand\":\"BYD\",\"model\":null,\"type\":\"nuclear\",\"licensePlate\":\"BYD1E11\"}"

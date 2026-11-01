@@ -58,9 +58,9 @@ class ClientServerEndToEndIntegrationTest {
         originalPort = ConfigManager.getServerPort();
 
         Map<String, String> admin = new HashMap<>();
-        admin.put("name", "Administrador");
+        admin.put("name", "admin");
         admin.put("username", "admin");
-        admin.put("password", "Admin@123");
+        admin.put("password", "Admin123!");
         admin.put("role", "admin");
         users.put("admin", admin);
 
@@ -234,9 +234,9 @@ class ClientServerEndToEndIntegrationTest {
     }
 
     @Test
-    void testCompleteClientServerWorkflowOverRealTcpSockets() throws Exception {
+    void testCompleteClientServerWorkflowOverRealTcpSockets() {
         // 1. Admin logs in and creates spot E1
-        Response adminLogin = SocketManager.sendRequest(User.loginRequest("admin", "Admin@123"));
+        Response adminLogin = SocketManager.sendRequest(User.loginRequest("admin", "Admin123!"));
         assertEquals(200, adminLogin.statusCode());
         String adminToken = LoginResponseValidation.extractToken(adminLogin);
 
@@ -263,7 +263,7 @@ class ClientServerEndToEndIntegrationTest {
         Response getVehs = SocketManager.sendRequest(Vehicle.getVehiclesRequest(aliceToken));
         List<Vehicle> aliceVehicles = VehicleResponseValidation.readVehicles(getVehs.data());
         assertEquals(1, aliceVehicles.size());
-        assertEquals("BYD1E11", aliceVehicles.get(0).licensePlate());
+        assertEquals("BYD1E11", aliceVehicles.getFirst().licensePlate());
 
         Response parkRes = SocketManager.sendRequest(
                 Vaga.updateVagaUserRequest(aliceToken, "E1", "ocupada", true, "BYD1E11"));
@@ -285,8 +285,8 @@ class ClientServerEndToEndIntegrationTest {
         Response allSpotsRes = SocketManager.sendRequest(Vaga.getVagasRequest(aliceToken));
         List<Vaga> spots = VagaResponseValidation.readVagas(allSpotsRes.data());
         assertEquals(1, spots.size());
-        assertEquals("E10", spots.get(0).spotName());
-        assertEquals("BYD1E11", spots.get(0).licensePlate());
+        assertEquals("E10", spots.getFirst().spotName());
+        assertEquals("BYD1E11", spots.getFirst().licensePlate());
 
         // 5. Logout
         assertEquals(200, SocketManager.sendRequest(User.logoutRequest(aliceToken)).statusCode());

@@ -24,7 +24,9 @@ public final class FieldValidation {
     }
 
     public static boolean validSpotName(String value) {
-        return value != null && !value.isBlank();
+        if (value == null) return false;
+        String trimmed = value.trim();
+        return !trimmed.isEmpty() && trimmed.codePointCount(0, trimmed.length()) <= 4;
     }
 
     public static boolean validFloor(String value) {
@@ -53,11 +55,21 @@ public final class FieldValidation {
     }
 
     public static boolean validLicensePlate(String value) {
-        return value != null && !value.isBlank();
+        if (value == null) return false;
+        String trimmed = value.trim();
+        return trimmed.length() == 7 && !trimmed.contains(" ");
     }
 
     public static boolean validBrand(String value) {
-        return value != null && !value.isBlank();
+        if (value == null) return false;
+        String trimmed = value.trim();
+        return !trimmed.isEmpty() && trimmed.codePointCount(0, trimmed.length()) <= 20;
+    }
+
+    public static boolean validModel(String value) {
+        if (value == null || value.isBlank()) return true;
+        String trimmed = value.trim();
+        return trimmed.codePointCount(0, trimmed.length()) <= 20;
     }
 
     public static boolean validIp(String value) {

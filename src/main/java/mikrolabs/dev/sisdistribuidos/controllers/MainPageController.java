@@ -56,11 +56,8 @@ import java.util.ResourceBundle;
 
 public class MainPageController extends BaseController implements Initializable {
 
-    public Button configBtn;
     @FXML
     private Node navbar;
-    @FXML
-    private Node footer;
 
     // Header de sessão e navegação entre módulos
     @FXML
@@ -178,7 +175,7 @@ public class MainPageController extends BaseController implements Initializable 
         new Thread(() -> {
             try {
                 Response vehResp = SocketManager.sendRequest(Vehicle.getVehiclesRequest(token));
-                if (vehResp != null && vehResp.statusCode() == 200) {
+                if (vehResp.statusCode() == 200) {
                     List<Vehicle> vehicles = VehicleResponseValidation.readVehicles(vehResp.data());
                     Platform.runLater(() -> {
                         vehiclesList.setAll(vehicles);
@@ -357,7 +354,6 @@ public class MainPageController extends BaseController implements Initializable 
         new Thread(() -> {
             try {
                 Response response = SocketManager.sendRequest(User.getUserRequest(token, username));
-                if (response == null) throw new ServerConnectionError();
 
                 var profileData = response.statusCode() == 200
                         ? ProfileResponseValidation.readData(response.data()) : null;
@@ -402,7 +398,6 @@ public class MainPageController extends BaseController implements Initializable 
         new Thread(() -> {
             try {
                 Response response = SocketManager.sendRequest(Vaga.getVagasRequest(token));
-                if (response == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
                     setButtonBusy(refreshVagasBtn, false);
@@ -484,20 +479,11 @@ public class MainPageController extends BaseController implements Initializable 
 
     private boolean shouldDisplayVaga(Vaga vaga, boolean showAllExceptOthers, boolean showOtherUsersSpots) {
         if (vaga == null || vaga.status() == null) return false;
-        String status = vaga.status();
-        if ("disponivel".equals(status)) {
-            return true;
-        }
-        if ("ocupada".equals(status)) {
-            if (isUserOwnPlate(vaga.licensePlate())) {
-                return true;
-            }
-            return showOtherUsersSpots;
-        }
-        if ("fora_de_servico".equals(status)) {
-            return showAllExceptOthers;
-        }
-        return showAllExceptOthers;
+        return switch (vaga.status()) {
+            case "disponivel" -> true;
+            case "ocupada" -> isUserOwnPlate(vaga.licensePlate()) || showOtherUsersSpots;
+            default -> showAllExceptOthers;
+        };
     }
 
     private boolean isThirdPartyOccupiedSpot(Vaga vaga) {
@@ -560,7 +546,7 @@ public class MainPageController extends BaseController implements Initializable 
 
         Map<Integer, List<Vaga>> visibleByFloor = new LinkedHashMap<>();
         for (Vaga vaga : sortedVisible) {
-            visibleByFloor.computeIfAbsent(vaga.floor(), k -> new ArrayList<>()).add(vaga);
+            visibleByFloor.computeIfAbsent(vaga.floor(), _ -> new ArrayList<>()).add(vaga);
         }
 
         Map<Integer, List<Vaga>> hiddenThirdPartyByFloor = new LinkedHashMap<>();
@@ -569,9 +555,9 @@ public class MainPageController extends BaseController implements Initializable 
             allSorted.sort(Comparator.comparingInt(Vaga::floor).thenComparing(Vaga::spotName, String.CASE_INSENSITIVE_ORDER));
             for (Vaga vaga : allSorted) {
                 if (isThirdPartyOccupiedSpot(vaga)) {
-                    hiddenThirdPartyByFloor.computeIfAbsent(vaga.floor(), k -> new ArrayList<>()).add(vaga);
+                    hiddenThirdPartyByFloor.computeIfAbsent(vaga.floor(), _ -> new ArrayList<>()).add(vaga);
                     if (showAllExceptOthers) {
-                        visibleByFloor.computeIfAbsent(vaga.floor(), k -> new ArrayList<>());
+                        visibleByFloor.computeIfAbsent(vaga.floor(), _ -> new ArrayList<>());
                     }
                 }
             }
@@ -659,7 +645,7 @@ public class MainPageController extends BaseController implements Initializable 
                 alternarFiltroOcupadasOutros();
             }
         };
-        tile.setOnMouseClicked(e -> revealAction.run());
+        tile.setOnMouseClicked(_ -> revealAction.run());
         tile.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.SPACE) {
                 revealAction.run();
@@ -734,7 +720,7 @@ public class MainPageController extends BaseController implements Initializable 
 
         tile.getChildren().addAll(topRow, typePill, bottomRow);
 
-        tile.setOnMouseClicked(e -> abrirModalAjustarVaga(vaga));
+        tile.setOnMouseClicked(_ -> abrirModalAjustarVaga(vaga));
         tile.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.SPACE) {
                 abrirModalAjustarVaga(vaga);
@@ -759,12 +745,12 @@ public class MainPageController extends BaseController implements Initializable 
 
         Label title = new Label("Cadastrar Nova Vaga");
         title.getStyleClass().add("card-title");
-        Label subtitle = new Label("Defina o identificador, andar, tipo e status inicial da vaga.");
+        Label subtitle = new Label("Defina o identificador (1–4 caracteres), andar e tipo. O status inicial será 'disponivel'.");
         subtitle.getStyleClass().add("card-subtitle");
         subtitle.setWrapText(true);
 
         TextField spotNameField = new TextField();
-        spotNameField.setPromptText("Ex.: A1");
+        spotNameField.setPromptText("Ex.: A1 (1 a 4 caracteres)");
 
         TextField floorField = new TextField();
         floorField.setPromptText("Ex.: 1");
@@ -773,14 +759,15 @@ public class MainPageController extends BaseController implements Initializable 
         typeCombo.setValue("combustao");
         typeCombo.setMaxWidth(Double.MAX_VALUE);
 
-        ComboBox<String> statusCombo = new ComboBox<>(FXCollections.observableArrayList("disponivel", "ocupada", "fora_de_servico"));
+        ComboBox<String> statusCombo = new ComboBox<>(FXCollections.observableArrayList("disponivel"));
         statusCombo.setValue("disponivel");
+        statusCombo.setDisable(true);
         statusCombo.setMaxWidth(Double.MAX_VALUE);
 
         Button cancelBtn = new Button("Cancelar");
         cancelBtn.getStyleClass().add("secondary-button");
         cancelBtn.setCancelButton(true);
-        cancelBtn.setOnAction(e -> modal.close());
+        cancelBtn.setOnAction(_ -> modal.close());
 
         Button saveBtn = new Button("Criar Vaga");
         saveBtn.getStyleClass().add("primary-button");
@@ -793,7 +780,7 @@ public class MainPageController extends BaseController implements Initializable 
             String status = statusCombo.getValue();
 
             if (!FieldValidation.validSpotName(spotName)) {
-                Toast.show(modal, "Informe o identificador da vaga.", Toast.Type.INFO);
+                Toast.show(modal, "Informe o identificador da vaga (1 a 4 caracteres).", Toast.Type.INFO);
                 return;
             }
             Integer floor = FieldValidation.parseFloor(floorText);
@@ -810,7 +797,6 @@ public class MainPageController extends BaseController implements Initializable 
             new Thread(() -> {
                 try {
                     Response response = SocketManager.sendRequest(Vaga.createVagaRequest(token, spotName, floor, status, type));
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(saveBtn, false);
@@ -839,9 +825,9 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         };
 
-        saveBtn.setOnAction(e -> submitAction.run());
-        spotNameField.setOnAction(e -> submitAction.run());
-        floorField.setOnAction(e -> submitAction.run());
+        saveBtn.setOnAction(_ -> submitAction.run());
+        spotNameField.setOnAction(_ -> submitAction.run());
+        floorField.setOnAction(_ -> submitAction.run());
 
         HBox actions = new HBox(10, cancelBtn, createSpacer(), saveBtn);
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -880,18 +866,25 @@ public class MainPageController extends BaseController implements Initializable 
         subtitle.getStyleClass().add("card-subtitle");
 
         TextField newSpotNameField = new TextField(vaga.spotName());
-        newSpotNameField.setPromptText("Novo código da vaga");
+        newSpotNameField.setPromptText("Novo código da vaga (1–4 chars)");
+        newSpotNameField.setDisable("ocupada".equals(vaga.status()));
 
         TextField floorField = new TextField(String.valueOf(vaga.floor()));
         floorField.setPromptText("Andar");
+        floorField.setDisable("ocupada".equals(vaga.status()));
 
-        ComboBox<String> statusCombo = new ComboBox<>(FXCollections.observableArrayList("disponivel", "ocupada", "fora_de_servico"));
+        ObservableList<String> statusOptions = isAdmin
+                ? ("ocupada".equals(vaga.status())
+                        ? FXCollections.observableArrayList("disponivel", "ocupada")
+                        : FXCollections.observableArrayList("disponivel", "ocupada", "fora_de_servico"))
+                : FXCollections.observableArrayList("disponivel", "ocupada");
+        ComboBox<String> statusCombo = new ComboBox<>(statusOptions);
         statusCombo.setValue(vaga.status());
         statusCombo.setMaxWidth(Double.MAX_VALUE);
 
         ComboBox<String> vehicleCombo = new ComboBox<>();
         vehicleCombo.setMaxWidth(Double.MAX_VALUE);
-        vehicleCombo.setCellFactory(lv -> createVehicleComboCell());
+        vehicleCombo.setCellFactory(_ -> createVehicleComboCell());
         vehicleCombo.setButtonCell(createVehicleComboCell());
         vehicleCombo.setEditable(isAdmin);
         vehicleCombo.setPromptText(isAdmin ? "Selecione ou digite uma placa" : "Selecione um veículo disponível");
@@ -904,13 +897,13 @@ public class MainPageController extends BaseController implements Initializable 
 
         CheckBox clearPlateCheck = new CheckBox("Liberar veículo desta vaga (limpar placa)");
 
-        vehicleCombo.valueProperty().addListener((obs, oldVal, newVal) -> {
+        vehicleCombo.valueProperty().addListener((_, _, newVal) -> {
             if (newVal != null && !newVal.isBlank() && "disponivel".equals(statusCombo.getValue())) {
                 statusCombo.setValue("ocupada");
             }
         });
 
-        clearPlateCheck.selectedProperty().addListener((obs, oldVal, selected) -> {
+        clearPlateCheck.selectedProperty().addListener((_, _, selected) -> {
             if (selected) {
                 vehicleCombo.setValue(null);
                 if (vehicleCombo.getEditor() != null) {
@@ -926,7 +919,7 @@ public class MainPageController extends BaseController implements Initializable 
         Button cancelBtn = new Button("Fechar");
         cancelBtn.getStyleClass().add("secondary-button");
         cancelBtn.setCancelButton(true);
-        cancelBtn.setOnAction(e -> modal.close());
+        cancelBtn.setOnAction(_ -> modal.close());
 
         Button deleteBtn = new Button("Excluir Vaga");
         deleteBtn.getStyleClass().add("danger-button");
@@ -980,7 +973,6 @@ public class MainPageController extends BaseController implements Initializable 
             if (clearPlate || "disponivel".equals(status) || "fora_de_servico".equals(status)) {
                 if (vaga.licensePlate() != null || clearPlate) {
                     includePlate = true;
-                    licensePlateToSend = null;
                 }
             } else if (!typedPlate.isEmpty()) {
                 if (!Objects.equals(typedPlate, vaga.licensePlate())) {
@@ -1021,7 +1013,6 @@ public class MainPageController extends BaseController implements Initializable 
             new Thread(() -> {
                 try {
                     Response response = SocketManager.sendRequest(request);
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(saveBtn, false);
@@ -1050,12 +1041,11 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         };
 
-        deleteBtn.setOnAction(e -> {
+        deleteBtn.setOnAction(_ -> {
             setButtonBusy(deleteBtn, true);
             new Thread(() -> {
                 try {
                     Response response = SocketManager.sendRequest(Vaga.deleteVagaRequest(token, vaga.spotName()));
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(deleteBtn, false);
@@ -1084,9 +1074,9 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         });
 
-        saveBtn.setOnAction(e -> saveAction.run());
-        newSpotNameField.setOnAction(e -> saveAction.run());
-        floorField.setOnAction(e -> saveAction.run());
+        saveBtn.setOnAction(_ -> saveAction.run());
+        newSpotNameField.setOnAction(_ -> saveAction.run());
+        floorField.setOnAction(_ -> saveAction.run());
 
         card.getChildren().add(new VBox(4, title, subtitle));
         if (isAdmin) {
@@ -1161,7 +1151,7 @@ public class MainPageController extends BaseController implements Initializable 
         if (currentSpotPlate != null && !currentSpotPlate.isBlank()
                 && availablePlates.stream().noneMatch(p -> p.equalsIgnoreCase(currentSpotPlate.trim()))) {
             if (ConfigManager.isAdmin() || isUserOwnPlate(currentSpotPlate)) {
-                availablePlates.add(0, currentSpotPlate.trim());
+                availablePlates.addFirst(currentSpotPlate.trim());
             }
         }
         return availablePlates;
@@ -1194,7 +1184,6 @@ public class MainPageController extends BaseController implements Initializable 
         new Thread(() -> {
             try {
                 Response response = SocketManager.sendRequest(Vaga.findVehicleRequest(token, plate));
-                if (response == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
                     setButtonBusy(findVehicleBtn, false);
@@ -1265,7 +1254,6 @@ public class MainPageController extends BaseController implements Initializable 
         new Thread(() -> {
             try {
                 Response response = SocketManager.sendRequest(Vehicle.getVehiclesRequest(token));
-                if (response == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
                     setButtonBusy(refreshVehiclesBtn, false);
@@ -1368,7 +1356,7 @@ public class MainPageController extends BaseController implements Initializable 
 
         card.getChildren().addAll(plateBox, brandModelLabel, metaRow);
 
-        card.setOnMouseClicked(e -> abrirModalAjustarVeiculo(vehicle));
+        card.setOnMouseClicked(_ -> abrirModalAjustarVeiculo(vehicle));
         card.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER || e.getCode() == KeyCode.SPACE) {
                 abrirModalAjustarVeiculo(vehicle);
@@ -1422,7 +1410,7 @@ public class MainPageController extends BaseController implements Initializable 
         Button cancelBtn = new Button("Cancelar");
         cancelBtn.getStyleClass().add("secondary-button");
         cancelBtn.setCancelButton(true);
-        cancelBtn.setOnAction(e -> modal.close());
+        cancelBtn.setOnAction(_ -> modal.close());
 
         Button saveBtn = new Button("Cadastrar Veículo");
         saveBtn.getStyleClass().add("primary-button");
@@ -1437,8 +1425,9 @@ public class MainPageController extends BaseController implements Initializable 
 
             if (!FieldValidation.validLicensePlate(plate)
                     || !FieldValidation.validBrand(brand)
+                    || !FieldValidation.validModel(model)
                     || !FieldValidation.validType(type)) {
-                Toast.show(modal, "Preencha placa, marca e motorização válidos.", Toast.Type.INFO);
+                Toast.show(modal, "Preencha placa (7 caracteres), marca (1–20), modelo (máx. 20) e motorização válidos.", Toast.Type.INFO);
                 return;
             }
 
@@ -1447,7 +1436,6 @@ public class MainPageController extends BaseController implements Initializable 
                 try {
                     Response response = SocketManager.sendRequest(
                             Vehicle.createVehicleRequest(token, brand, model, type, plate));
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(saveBtn, false);
@@ -1478,10 +1466,10 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         };
 
-        saveBtn.setOnAction(e -> submitAction.run());
-        plateField.setOnAction(e -> submitAction.run());
-        brandField.setOnAction(e -> submitAction.run());
-        modelField.setOnAction(e -> submitAction.run());
+        saveBtn.setOnAction(_ -> submitAction.run());
+        plateField.setOnAction(_ -> submitAction.run());
+        brandField.setOnAction(_ -> submitAction.run());
+        modelField.setOnAction(_ -> submitAction.run());
 
         HBox actions = new HBox(10, cancelBtn, createSpacer(), saveBtn);
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -1517,7 +1505,6 @@ public class MainPageController extends BaseController implements Initializable 
         new Thread(() -> {
             try {
                 Response response = SocketManager.sendRequest(Vehicle.getVehicleRequest(token, plate));
-                if (response == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
                     setButtonBusy(searchVehicleBtn, false);
@@ -1576,7 +1563,7 @@ public class MainPageController extends BaseController implements Initializable 
         modelField.setPromptText("Modelo do veículo");
 
         CheckBox clearModelCheck = new CheckBox("Remover modelo (deixar sem modelo)");
-        clearModelCheck.selectedProperty().addListener((obs, oldVal, selected) -> {
+        clearModelCheck.selectedProperty().addListener((_, _, selected) -> {
             if (selected) modelField.clear();
             modelField.setDisable(selected);
         });
@@ -1588,7 +1575,7 @@ public class MainPageController extends BaseController implements Initializable 
         Button cancelBtn = new Button("Fechar");
         cancelBtn.getStyleClass().add("secondary-button");
         cancelBtn.setCancelButton(true);
-        cancelBtn.setOnAction(e -> modal.close());
+        cancelBtn.setOnAction(_ -> modal.close());
 
         Button deleteBtn = new Button("Excluir Veículo");
         deleteBtn.getStyleClass().add("danger-button");
@@ -1601,6 +1588,10 @@ public class MainPageController extends BaseController implements Initializable 
             String brandText = textOf(brandField).trim();
             String brandToSend = null;
             if (!brandText.isEmpty() && !Objects.equals(brandText, vehicle.brand())) {
+                if (!FieldValidation.validBrand(brandText)) {
+                    Toast.show(modal, "Marca deve ter entre 1 e 20 caracteres.", Toast.Type.INFO);
+                    return;
+                }
                 brandToSend = brandText;
             }
 
@@ -1610,8 +1601,11 @@ public class MainPageController extends BaseController implements Initializable 
             String modelToSend = null;
             if (clearModel) {
                 includeModel = true;
-                modelToSend = null;
             } else if (!modelText.isEmpty() && !Objects.equals(modelText, vehicle.model())) {
+                if (!FieldValidation.validModel(modelText)) {
+                    Toast.show(modal, "Modelo deve ter no máximo 20 caracteres.", Toast.Type.INFO);
+                    return;
+                }
                 includeModel = true;
                 modelToSend = modelText;
             }
@@ -1637,7 +1631,6 @@ public class MainPageController extends BaseController implements Initializable 
             new Thread(() -> {
                 try {
                     Response response = SocketManager.sendRequest(request);
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(saveBtn, false);
@@ -1668,12 +1661,11 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         };
 
-        deleteBtn.setOnAction(e -> {
+        deleteBtn.setOnAction(_ -> {
             setButtonBusy(deleteBtn, true);
             new Thread(() -> {
                 try {
                     Response response = SocketManager.sendRequest(Vehicle.deleteVehicleRequest(token, vehicle.licensePlate()));
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(deleteBtn, false);
@@ -1704,9 +1696,9 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         });
 
-        saveBtn.setOnAction(e -> saveAction.run());
-        brandField.setOnAction(e -> saveAction.run());
-        modelField.setOnAction(e -> saveAction.run());
+        saveBtn.setOnAction(_ -> saveAction.run());
+        brandField.setOnAction(_ -> saveAction.run());
+        modelField.setOnAction(_ -> saveAction.run());
 
         VBox modelBox = labeledControl("Modelo", modelField);
         modelBox.getChildren().add(clearModelCheck);
@@ -1761,11 +1753,11 @@ public class MainPageController extends BaseController implements Initializable 
 
         Button editNameBtn = new Button("Editar Nome");
         editNameBtn.getStyleClass().add("primary-button");
-        editNameBtn.setOnAction(e -> abrirModalEditarUsuarioAlvo(loadedTargetUser));
+        editNameBtn.setOnAction(_ -> abrirModalEditarUsuarioAlvo(loadedTargetUser));
 
         Button deleteUserBtn = new Button("Excluir Conta");
         deleteUserBtn.getStyleClass().add("danger-button");
-        deleteUserBtn.setOnAction(e -> {
+        deleteUserBtn.setOnAction(_ -> {
             Stage stage = getMainStage();
             String target = loadedTargetUser.username();
             NavigationUtils.openDeleteConfirmationModal(stage, target, deleteResponse -> {
@@ -1799,7 +1791,6 @@ public class MainPageController extends BaseController implements Initializable 
         new Thread(() -> {
             try {
                 Response response = SocketManager.sendRequest(User.getUserRequest(token, targetUsername));
-                if (response == null) throw new ServerConnectionError();
 
                 var profileData = response.statusCode() == 200
                         ? ProfileResponseValidation.readData(response.data()) : null;
@@ -1865,7 +1856,7 @@ public class MainPageController extends BaseController implements Initializable 
         Button cancelBtn = new Button("Cancelar");
         cancelBtn.getStyleClass().add("secondary-button");
         cancelBtn.setCancelButton(true);
-        cancelBtn.setOnAction(e -> modal.close());
+        cancelBtn.setOnAction(_ -> modal.close());
 
         Button saveBtn = new Button("Criar Conta");
         saveBtn.getStyleClass().add("primary-button");
@@ -1899,7 +1890,6 @@ public class MainPageController extends BaseController implements Initializable 
                 try {
                     Response response = SocketManager.sendRequest(
                             User.registerWithRoleRequest(name, username, password, role, token));
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(saveBtn, false);
@@ -1927,10 +1917,10 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         };
 
-        saveBtn.setOnAction(e -> submitAction.run());
-        nameField.setOnAction(e -> submitAction.run());
-        usernameField.setOnAction(e -> submitAction.run());
-        passwordField.setOnAction(e -> submitAction.run());
+        saveBtn.setOnAction(_ -> submitAction.run());
+        nameField.setOnAction(_ -> submitAction.run());
+        usernameField.setOnAction(_ -> submitAction.run());
+        passwordField.setOnAction(_ -> submitAction.run());
 
         HBox actions = new HBox(10, cancelBtn, createSpacer(), saveBtn);
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -1971,7 +1961,7 @@ public class MainPageController extends BaseController implements Initializable 
         Button cancelBtn = new Button("Cancelar");
         cancelBtn.getStyleClass().add("secondary-button");
         cancelBtn.setCancelButton(true);
-        cancelBtn.setOnAction(e -> modal.close());
+        cancelBtn.setOnAction(_ -> modal.close());
 
         Button saveBtn = new Button("Salvar Nome");
         saveBtn.getStyleClass().add("primary-button");
@@ -1989,7 +1979,6 @@ public class MainPageController extends BaseController implements Initializable 
                 try {
                     Response response = SocketManager.sendRequest(
                             User.updateUserNameRequest(token, targetUser.username(), newName));
-                    if (response == null) throw new ServerConnectionError();
 
                     Platform.runLater(() -> {
                         setButtonBusy(saveBtn, false);
@@ -2019,8 +2008,8 @@ public class MainPageController extends BaseController implements Initializable 
             }).start();
         };
 
-        saveBtn.setOnAction(e -> saveAction.run());
-        nameField.setOnAction(e -> saveAction.run());
+        saveBtn.setOnAction(_ -> saveAction.run());
+        nameField.setOnAction(_ -> saveAction.run());
 
         HBox actions = new HBox(10, cancelBtn, createSpacer(), saveBtn);
         actions.setAlignment(Pos.CENTER_RIGHT);
