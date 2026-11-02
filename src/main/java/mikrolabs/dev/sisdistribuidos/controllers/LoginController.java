@@ -2,7 +2,6 @@ package mikrolabs.dev.sisdistribuidos.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -29,13 +28,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class LoginController extends BaseController implements Initializable {
+public class LoginController extends BaseController {
 
     public Label returnLabel;
     public Button enviarBtn;
     public TextField usernameTextBox;
     public PasswordField passwordTextBox;
-    public Button configBtn;
     public Button enviarRegisterBtn;
     public PasswordField passwordRegisterTextBox;
     public TextField usernameRegisterTextBox;
@@ -50,10 +48,6 @@ public class LoginController extends BaseController implements Initializable {
     @FXML
     public ImageView registerLogoImage;
     boolean isRegister;
-    @FXML
-    private Node navbar;
-    @FXML
-    private Node footer;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -96,15 +90,12 @@ public class LoginController extends BaseController implements Initializable {
             return;
         }
 
-        if (!validUsername(toast, username)) return;
+        if (isInvalidUsername(toast, username)) return;
         enviarBtn.setDisable(true);
 
         new Thread(() -> {
             try {
                 Response loginResponse = SocketManager.sendRequest(User.loginRequest(username, password));
-                if (loginResponse == null) {
-                    throw new ServerConnectionError();
-                }
 
                 String extractedToken = null;
                 String fetchedRole = null;
@@ -115,7 +106,7 @@ public class LoginController extends BaseController implements Initializable {
                         extractedToken = LoginResponseValidation.extractToken(loginResponse);
                         try {
                             Response getUserResponse = SocketManager.sendRequest(User.getUserRequest(extractedToken, username));
-                            if (getUserResponse != null && getUserResponse.statusCode() == 200) {
+                            if (getUserResponse.statusCode() == 200) {
                                 var profile = ProfileResponseValidation.readData(getUserResponse.data());
                                 if (profile != null && profile.role() != null) {
                                     fetchedRole = profile.role();

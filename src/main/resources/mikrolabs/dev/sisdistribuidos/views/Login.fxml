@@ -8,8 +8,7 @@
 <AnchorPane prefHeight="600.0" prefWidth="900.0" styleClass="main-background" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mikrolabs.dev.sisdistribuidos.controllers.LoginController">
 
     <!-- Navbar Superior -->
-    <fx:include fx:id="navbar"
-                source="components/Navbar.fxml"
+    <fx:include source="components/Navbar.fxml"
                 AnchorPane.topAnchor="0.0"
                 AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" />
@@ -83,8 +82,7 @@
     </StackPane>
 
     <!-- Rodapé -->
-    <fx:include fx:id="footer"
-                source="components/Footer.fxml"
+    <fx:include source="components/Footer.fxml"
                 AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0"/>

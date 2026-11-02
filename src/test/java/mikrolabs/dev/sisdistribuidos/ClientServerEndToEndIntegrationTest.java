@@ -151,7 +151,7 @@ class ClientServerEndToEndIntegrationTest {
                 JsonObject v = new JsonObject();
                 v.addProperty("spotName", spotName);
                 v.addProperty("floor", d.get("floor").getAsInt());
-                v.addProperty("status", d.get("status").getAsString());
+                v.addProperty("status", d.has("status") && !d.get("status").isJsonNull() ? d.get("status").getAsString() : "disponivel");
                 v.addProperty("type", d.get("type").getAsString());
                 v.add("licensePlate", null);
                 vagas.put(spotName, v);
@@ -246,7 +246,7 @@ class ClientServerEndToEndIntegrationTest {
         assertEquals("admin", adminProfile.role());
 
         Response createSpot = SocketManager
-                .sendRequest(Vaga.createVagaRequest(adminToken, "E1", 2, "disponivel", "eletrico"));
+                .sendRequest(Vaga.createVagaRequest(adminToken, "E1", 2, "eletrico"));
         assertEquals(201, createSpot.statusCode());
 
         // 2. User registers, logs in, creates electric vehicle, parks in E1

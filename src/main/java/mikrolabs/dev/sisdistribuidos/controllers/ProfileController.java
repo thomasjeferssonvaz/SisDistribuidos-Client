@@ -3,7 +3,6 @@ package mikrolabs.dev.sisdistribuidos.controllers;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -25,7 +24,7 @@ import mikrolabs.dev.sisdistribuidos.utils.Toast;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ProfileController extends BaseController implements Initializable {
+public class ProfileController extends BaseController {
 
     @FXML
     public Button logoutButton;
@@ -73,10 +72,6 @@ public class ProfileController extends BaseController implements Initializable {
         new Thread(() -> {
             try {
                 Response getUserResponse = SocketManager.sendRequest(User.getUserRequest(token, username));
-
-                if (getUserResponse == null) {
-                    throw new ServerConnectionError();
-                }
 
                 var profileData = getUserResponse.statusCode() == 200
                         ? ProfileResponseValidation.readData(getUserResponse.data()) : null;
@@ -136,7 +131,6 @@ public class ProfileController extends BaseController implements Initializable {
         new Thread(() -> {
             try {
                 Response updateUserNameResponse = SocketManager.sendRequest(User.updateUserNameRequest(token, username, novoNome));
-                if (updateUserNameResponse == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
                     if (!toast.isShowing() || SessionUtils.handleExpiredSession(toast, updateUserNameResponse)) {
@@ -153,13 +147,9 @@ public class ProfileController extends BaseController implements Initializable {
                 });
 
             } catch (ServerConnectionError serverConnectionError) {
-                Platform.runLater(() -> {
-                    Toast.show(toast, serverConnectionError.getMessage(), Toast.Type.ERROR);
-                });
+                Platform.runLater(() -> Toast.show(toast, serverConnectionError.getMessage(), Toast.Type.ERROR));
             } catch (Exception e) {
-                Platform.runLater(() -> {
-                    Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR);
-                });
+                Platform.runLater(() -> Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR));
             }
         }).start();
     }
@@ -197,7 +187,6 @@ public class ProfileController extends BaseController implements Initializable {
             try {
                 Response updateUserPasswordResponse = SocketManager.sendRequest(
                         User.updateUserPasswordRequest(token, username, senhaAtual, novaSenha));
-                if (updateUserPasswordResponse == null) throw new ServerConnectionError();
 
                 Platform.runLater(() -> {
                     if (!toast.isShowing() || SessionUtils.handleExpiredSession(toast, updateUserPasswordResponse)) {
@@ -218,19 +207,15 @@ public class ProfileController extends BaseController implements Initializable {
                 });
 
             } catch (ServerConnectionError serverConnectionError) {
-                Platform.runLater(() -> {
-                    Toast.show(toast, serverConnectionError.getMessage(), Toast.Type.ERROR);
-                });
+                Platform.runLater(() -> Toast.show(toast, serverConnectionError.getMessage(), Toast.Type.ERROR));
             } catch (Exception e) {
-                Platform.runLater(() -> {
-                    Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR);
-                });
+                Platform.runLater(() -> Toast.show(toast, "Erro inesperado na comunicação ao buscar usuário.", Toast.Type.ERROR));
             }
         }).start();
     }
 
     @FXML
-    public void deslogar(ActionEvent mouseEvent) {
+    public void deslogar() {
         if (logoutButton.isDisabled()) return;
         Stage profileStage = getProfileStage();
         String token = ConfigManager.getToken();

@@ -3,7 +3,6 @@ package mikrolabs.dev.sisdistribuidos.controllers;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -17,7 +16,7 @@ import mikrolabs.dev.sisdistribuidos.utils.Toast;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ConfigController extends BaseController implements Initializable {
+public class ConfigController extends BaseController {
 
     public TextField serverIpField;
     public TextField serverPortField;

@@ -63,13 +63,13 @@ class ProtocolSerializationAndValidationTest {
 
     @Test
     void testVagaAndVehicleRequestBuildersAndNullSemantics() {
-        // CreateVaga
-        Request createVaga = Vaga.createVagaRequest("tok", "A1", 2, "disponivel", "eletrico");
+        // CreateVaga (status is assigned automatically as "disponivel" by the server)
+        Request createVaga = Vaga.createVagaRequest("tok", "A1", 2, "eletrico");
         assertEquals("createvaga", createVaga.method());
         JsonObject cv = createVaga.data().getAsJsonObject();
         assertEquals("A1", cv.get("spotName").getAsString());
         assertEquals(2, cv.get("floor").getAsInt());
-        assertEquals("disponivel", cv.get("status").getAsString());
+        assertFalse(cv.has("status"));
         assertEquals("eletrico", cv.get("type").getAsString());
 
         // GetVagas (D3)

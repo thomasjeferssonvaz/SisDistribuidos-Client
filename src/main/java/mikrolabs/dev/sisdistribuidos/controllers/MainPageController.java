@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -54,7 +53,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-public class MainPageController extends BaseController implements Initializable {
+public class MainPageController extends BaseController {
 
     @FXML
     private Node navbar;
@@ -287,7 +286,7 @@ public class MainPageController extends BaseController implements Initializable 
         if (vehiclesGalleryTitleLabel != null && vehiclesGallerySubtitleLabel != null) {
             if (isAdmin) {
                 vehiclesGalleryTitleLabel.setText("Consulta Administrativa de Veículos");
-                vehiclesGallerySubtitleLabel.setText("Digite qualquer placa no campo acima e clique em 'Abrir Ficha da Placa' para consultar, editar ou excluir.");
+                vehiclesGallerySubtitleLabel.setText("Digite qualquer placa no campo acima e clique em 'Abrir Ficha da Placa' para consultar ou excluir.");
             } else {
                 vehiclesGalleryTitleLabel.setText("Minha Garagem de Veículos (clique em um cartão para ajustar)");
                 vehiclesGallerySubtitleLabel.setText("Clique em qualquer veículo abaixo para alterar dados ou remover, ou use '+ Cadastrar Veículo'.");
@@ -796,7 +795,7 @@ public class MainPageController extends BaseController implements Initializable 
             setButtonBusy(saveBtn, true);
             new Thread(() -> {
                 try {
-                    Response response = SocketManager.sendRequest(Vaga.createVagaRequest(token, spotName, floor, status, type));
+                    Response response = SocketManager.sendRequest(Vaga.createVagaRequest(token, spotName, floor, type));
 
                     Platform.runLater(() -> {
                         setButtonBusy(saveBtn, false);
@@ -854,6 +853,12 @@ public class MainPageController extends BaseController implements Initializable 
         if (!SessionUtils.ensureSession(owner, token, username)) return;
 
         boolean isAdmin = ConfigManager.isAdmin();
+        if (!isAdmin && "fora_de_servico".equals(vaga.status())) {
+            if (owner != null) {
+                Toast.show(owner, "Esta vaga está fora de serviço e só pode ser alterada por um administrador.", Toast.Type.ERROR);
+            }
+            return;
+        }
         Stage modal = createStyledModal(owner, "Ajustar Vaga — " + vaga.spotName(), 450);
 
         VBox card = new VBox(14);
@@ -876,7 +881,7 @@ public class MainPageController extends BaseController implements Initializable 
         ObservableList<String> statusOptions = isAdmin
                 ? ("ocupada".equals(vaga.status())
                         ? FXCollections.observableArrayList("disponivel", "ocupada")
-                        : FXCollections.observableArrayList("disponivel", "ocupada", "fora_de_servico"))
+                        : FXCollections.observableArrayList("disponivel", "fora_de_servico"))
                 : FXCollections.observableArrayList("disponivel", "ocupada");
         ComboBox<String> statusCombo = new ComboBox<>(statusOptions);
         statusCombo.setValue(vaga.status());
@@ -886,8 +891,8 @@ public class MainPageController extends BaseController implements Initializable 
         vehicleCombo.setMaxWidth(Double.MAX_VALUE);
         vehicleCombo.setCellFactory(_ -> createVehicleComboCell());
         vehicleCombo.setButtonCell(createVehicleComboCell());
-        vehicleCombo.setEditable(isAdmin);
-        vehicleCombo.setPromptText(isAdmin ? "Selecione ou digite uma placa" : "Selecione um veículo disponível");
+        vehicleCombo.setEditable(false);
+        vehicleCombo.setPromptText("Selecione um veículo disponível");
 
         List<String> availablePlates = getAvailableUserPlatesForSpot(vaga);
         vehicleCombo.setItems(FXCollections.observableArrayList(availablePlates));
@@ -895,7 +900,9 @@ public class MainPageController extends BaseController implements Initializable 
             vehicleCombo.setValue(vaga.licensePlate());
         }
 
-        CheckBox clearPlateCheck = new CheckBox("Liberar veículo desta vaga (limpar placa)");
+        CheckBox clearPlateCheck = new CheckBox(isAdmin
+                ? "Liberar veículo e desocupar vaga"
+                : "Liberar veículo desta vaga (limpar placa)");
 
         vehicleCombo.valueProperty().addListener((_, _, newVal) -> {
             if (newVal != null && !newVal.isBlank() && "disponivel".equals(statusCombo.getValue())) {
@@ -970,14 +977,34 @@ public class MainPageController extends BaseController implements Initializable 
             boolean includePlate = false;
             String licensePlateToSend = null;
 
-            if (clearPlate || "disponivel".equals(status) || "fora_de_servico".equals(status)) {
-                if (vaga.licensePlate() != null || clearPlate) {
-                    includePlate = true;
+            if (isAdmin) {
+                if (clearPlate || "disponivel".equals(status) || "fora_de_servico".equals(status)) {
+                    if (vaga.licensePlate() != null || clearPlate) {
+                        includePlate = true;
+                    }
                 }
-            } else if (!typedPlate.isEmpty()) {
-                if (!Objects.equals(typedPlate, vaga.licensePlate())) {
-                    includePlate = true;
-                    licensePlateToSend = typedPlate;
+            } else {
+                if (clearPlate || "disponivel".equals(status) || "fora_de_servico".equals(status)) {
+                    if (vaga.licensePlate() != null || clearPlate) {
+                        includePlate = true;
+                    }
+                } else if (!typedPlate.isEmpty()) {
+                    if (!Objects.equals(typedPlate, vaga.licensePlate())) {
+                        includePlate = true;
+                        licensePlateToSend = typedPlate;
+                    }
+                }
+
+                if ("ocupada".equals(status)) {
+                    String effectivePlate = includePlate ? licensePlateToSend : vaga.licensePlate();
+                    if (effectivePlate == null || effectivePlate.isBlank()) {
+                        Toast.show(modal, "Para ocupar a vaga, selecione um veículo da sua conta.", Toast.Type.INFO);
+                        return;
+                    }
+                    if (!FieldValidation.validLicensePlate(effectivePlate)) {
+                        Toast.show(modal, "A placa do veículo deve ter exatamente 7 caracteres.", Toast.Type.INFO);
+                        return;
+                    }
                 }
             }
 
@@ -1089,8 +1116,21 @@ public class MainPageController extends BaseController implements Initializable 
             card.getChildren().add(adminRow);
         }
 
-        VBox plateBox = labeledControl("Veículo na Vaga (disponíveis da sua conta)", vehicleCombo);
-        plateBox.getChildren().add(clearPlateCheck);
+        VBox plateBox;
+        if (isAdmin) {
+            plateBox = new VBox(6);
+            if (vaga.licensePlate() != null && !vaga.licensePlate().isBlank()) {
+                Label currentVehicleLabel = new Label("Veículo estacionado: " + vaga.licensePlate());
+                currentVehicleLabel.getStyleClass().add("field-label");
+                plateBox.getChildren().addAll(currentVehicleLabel, clearPlateCheck);
+            } else {
+                plateBox.setVisible(false);
+                plateBox.setManaged(false);
+            }
+        } else {
+            plateBox = labeledControl("Veículo na Vaga (disponíveis da sua conta)", vehicleCombo);
+            plateBox.getChildren().add(clearPlateCheck);
+        }
 
         HBox actions = new HBox(10, cancelBtn, deleteBtn, createSpacer(), saveBtn);
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -1296,7 +1336,7 @@ public class MainPageController extends BaseController implements Initializable 
             adminHint.setPadding(new Insets(24));
             Label title = new Label("Modo Administrador: pesquise qualquer veículo pela placa acima");
             title.getStyleClass().add("section-header-label");
-            Label sub = new Label("Ao pesquisar uma placa no campo superior, uma janela menor será aberta com os dados do veículo para edição ou exclusão.");
+            Label sub = new Label("Ao pesquisar uma placa no campo superior, uma janela menor será aberta com os dados do veículo para consulta ou exclusão.");
             sub.getStyleClass().add("card-subtitle");
             adminHint.getChildren().addAll(title, sub);
             vehiclesVisualPane.getChildren().add(adminHint);
@@ -1544,6 +1584,7 @@ public class MainPageController extends BaseController implements Initializable 
         String username = ConfigManager.getUsername();
         if (!SessionUtils.ensureSession(owner, token, username)) return;
 
+        boolean isAdmin = ConfigManager.isAdmin();
         Stage modal = createStyledModal(owner, "Ficha do Veículo — " + vehicle.licensePlate(), 440);
         VBox card = new VBox(14);
         card.getStyleClass().add("auth-card");
@@ -1553,16 +1594,20 @@ public class MainPageController extends BaseController implements Initializable 
         String parkedInfo = findParkedSpotForPlate(vehicle.licensePlate());
         Label subtitle = new Label(parkedInfo != null
                 ? "Atualmente estacionado na vaga " + parkedInfo
-                : "Edite os dados cadastrais ou remova o veículo.");
+                : (isAdmin ? "Visualize os dados cadastrais ou remova o veículo." : "Edite os dados cadastrais ou remova o veículo."));
         subtitle.getStyleClass().add("card-subtitle");
 
         TextField brandField = new TextField(vehicle.brand() != null ? vehicle.brand() : "");
         brandField.setPromptText("Marca do veículo");
+        brandField.setDisable(isAdmin);
 
         TextField modelField = new TextField(vehicle.model() != null ? vehicle.model() : "");
         modelField.setPromptText("Modelo do veículo");
+        modelField.setDisable(isAdmin);
 
         CheckBox clearModelCheck = new CheckBox("Remover modelo (deixar sem modelo)");
+        clearModelCheck.setVisible(!isAdmin);
+        clearModelCheck.setManaged(!isAdmin);
         clearModelCheck.selectedProperty().addListener((_, _, selected) -> {
             if (selected) modelField.clear();
             modelField.setDisable(selected);
@@ -1571,6 +1616,7 @@ public class MainPageController extends BaseController implements Initializable 
         ComboBox<String> typeCombo = new ComboBox<>(FXCollections.observableArrayList("combustao", "eletrico"));
         typeCombo.setValue(vehicle.type());
         typeCombo.setMaxWidth(Double.MAX_VALUE);
+        typeCombo.setDisable(isAdmin);
 
         Button cancelBtn = new Button("Fechar");
         cancelBtn.getStyleClass().add("secondary-button");
@@ -1582,7 +1628,9 @@ public class MainPageController extends BaseController implements Initializable 
 
         Button saveBtn = new Button("Salvar Alterações");
         saveBtn.getStyleClass().add("primary-button");
-        saveBtn.setDefaultButton(true);
+        saveBtn.setDefaultButton(!isAdmin);
+        saveBtn.setVisible(!isAdmin);
+        saveBtn.setManaged(!isAdmin);
 
         Runnable saveAction = () -> {
             String brandText = textOf(brandField).trim();

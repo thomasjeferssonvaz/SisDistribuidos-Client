@@ -16,12 +16,11 @@ public record Vaga(
             String status
     ) {}
 
-    public static Request createVagaRequest(String token, String spotName, int floor, String status, String type) {
+    public static Request createVagaRequest(String token, String spotName, int floor, String type) {
         JsonObject data = new JsonObject();
         data.addProperty("token", token);
         data.addProperty("spotName", spotName);
         data.addProperty("floor", floor);
-        data.addProperty("status", status);
         data.addProperty("type", type);
         return new Request("createvaga", data);
     }

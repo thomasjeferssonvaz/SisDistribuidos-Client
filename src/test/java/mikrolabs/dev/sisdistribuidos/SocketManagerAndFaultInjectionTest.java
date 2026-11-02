@@ -79,8 +79,9 @@ class SocketManagerAndFaultInjectionTest {
             ConfigManager.save("127.0.0.1", String.valueOf(ss.getLocalPort()));
             Thread serverThread = new Thread(() -> {
                 try (Socket client = ss.accept();
+                     BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
                      OutputStream out = client.getOutputStream()) {
-                    new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8)).readLine();
+                    in.readLine();
                     out.write("{broken_json\n".getBytes(StandardCharsets.UTF_8));
                     out.flush();
                 } catch (Exception ignored) {
@@ -101,8 +102,9 @@ class SocketManagerAndFaultInjectionTest {
             ConfigManager.save("127.0.0.1", String.valueOf(ss.getLocalPort()));
             Thread serverThread = new Thread(() -> {
                 try (Socket client = ss.accept();
+                     BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
                      OutputStream out = client.getOutputStream()) {
-                    new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8)).readLine();
+                    in.readLine();
                     out.write("{\"statusCode\":200.5,\"message\":\"OK\",\"data\":null}\n".getBytes(StandardCharsets.UTF_8));
                     out.flush();
                 } catch (Exception ignored) {
@@ -125,8 +127,9 @@ class SocketManagerAndFaultInjectionTest {
             ConfigManager.save("127.0.0.1", String.valueOf(ss.getLocalPort()));
             Thread serverThread = new Thread(() -> {
                 try (Socket client = ss.accept();
+                     BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8));
                      OutputStream out = client.getOutputStream()) {
-                    new BufferedReader(new InputStreamReader(client.getInputStream(), StandardCharsets.UTF_8)).readLine();
+                    in.readLine();
                     String part1 = "{\"statusCode\":200,";
                     String part2 = "\"message\":\"Sucesso\",";
                     String part3 = "\"data\":{\"floor\":1,\"spotName\":\"A1\",\"status\":\"ocupada\"}}\n";
