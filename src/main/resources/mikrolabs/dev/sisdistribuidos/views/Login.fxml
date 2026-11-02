@@ -20,7 +20,7 @@
         <!-- Card de Login -->
         <VBox fx:id="loginBox" alignment="TOP_CENTER" maxWidth="400.0" spacing="14.0" styleClass="auth-card">
             <VBox alignment="CENTER" spacing="6.0">
-                <ImageView fx:id="welcomeLogoImage" fitHeight="68.0" fitWidth="68.0" pickOnBounds="true" preserveRatio="true" smooth="true" />
+                <ImageView fx:id="welcomeLogoImage" fitHeight="68.0" fitWidth="68.0" pickOnBounds="true" preserveRatio="true" />
                 <Label styleClass="card-title" text="Bem-vindo" />
                 <Label styleClass="card-subtitle" text="Entre com suas credenciais para acessar" />
             </VBox>
@@ -49,7 +49,7 @@
         <!-- Card de Registro -->
         <VBox fx:id="registerBox" alignment="TOP_CENTER" maxWidth="400.0" spacing="12.0" styleClass="auth-card" visible="false">
             <VBox alignment="CENTER" spacing="6.0">
-                <ImageView fx:id="registerLogoImage" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" smooth="true" />
+                <ImageView fx:id="registerLogoImage" fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true" />
                 <Label styleClass="card-title" text="Criar Conta" />
                 <Label styleClass="card-subtitle" text="Preencha os dados abaixo para se cadastrar" />
             </VBox>

@@ -204,9 +204,6 @@ public class LoginController extends BaseController {
             try {
                 Response registerResponse = SocketManager.sendRequest(User.registerRequest(name, username, password));
                 System.out.println("Received: " + registerResponse);
-                if (registerResponse == null) {
-                    throw new ServerConnectionError();
-                }
 
                 Platform.runLater(() -> {
                     enviarRegisterBtn.setDisable(false);
@@ -239,16 +236,16 @@ public class LoginController extends BaseController {
         }).start();
     }
 
-    private boolean validUsername(Stage stage, String username) {
+    private boolean isInvalidUsername(Stage stage, String username) {
         if (!FieldValidation.validUsername(username)) {
             Toast.show(stage, "Username: use 3–20 caracteres, com letras minúsculas, números, ponto ou sublinhado.", Toast.Type.INFO);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean validCredentials(Stage stage, String username, String password) {
-        if (!validUsername(stage, username)) return false;
+        if (isInvalidUsername(stage, username)) return false;
         if (!FieldValidation.validPassword(password)) {
             Toast.show(stage, "Senha: use 8–20 caracteres, incluindo maiúscula, minúscula, número e símbolo permitido (# . * & % $ @ ! ( ) - _ = +).", Toast.Type.INFO);
             return false;
